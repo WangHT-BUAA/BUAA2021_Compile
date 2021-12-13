@@ -1,0 +1,12 @@
+LABEL Main
+IMM temp2 0
+LABEL MainEnd
+RETURN temp2
+FUNC func0
+IMM temp0 1
+RETURN temp0
+FUNC_END func0
+FUNC func1
+IMM temp1 2
+RETURN temp1
+FUNC_END func1

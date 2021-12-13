@@ -1,0 +1,12 @@
+int func(int a,int b,int c[]){
+    int d[3];
+    int e;
+    int f;
+    func(e,f,d);
+    return 0;
+}
+
+int main(){
+
+return 0;
+}

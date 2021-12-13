@@ -1,0 +1,28 @@
+.data
+array: .space 12
+.text
+Main:
+li $s0 , 0
+li $t0 , 8
+sw $s0 , array($t0)
+li $v0 , 10
+syscall
+li $t0 , 8
+lw $v0 , array($t0)
+jr $ra
+func0:
+li $s0 , 1
+li $t0 , 0
+sw $s0 , array($t0)
+li $t0 , 0
+lw $v0 , array($t0)
+jr $ra
+jr $ra
+func1:
+li $s0 , 2
+li $t0 , 4
+sw $s0 , array($t0)
+li $t0 , 4
+lw $v0 , array($t0)
+jr $ra
+jr $ra
