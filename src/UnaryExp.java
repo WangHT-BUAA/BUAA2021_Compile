@@ -138,8 +138,6 @@ public class UnaryExp {
         if (type == 1) {
             ans.addAll(primaryExp.getMidCode());
         } else if (type == 2) {
-            //todo 函数调用
-            // pushs call pops
 
             String initName = ident.getSymbolName(); //函数名
             SymbolItem item = Compiler.getSymbolItem(initName);

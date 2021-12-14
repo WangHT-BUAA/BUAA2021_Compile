@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Cond {
     //条件表达式
     //Cond → LOrExp
@@ -22,5 +24,9 @@ public class Cond {
         ans.append(lOrExp.toPrint());
         ans.append("<Cond>\n");
         return ans.toString();
+    }
+
+    public ArrayList<MidCode> getMidCode() {
+        return lOrExp.getMidCode();
     }
 }

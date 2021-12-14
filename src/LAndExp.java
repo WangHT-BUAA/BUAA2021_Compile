@@ -55,4 +55,25 @@ public class LAndExp {
         ans.append("<LAndExp>\n");
         return ans.toString();
     }
+
+    public ArrayList<MidCode> getMidCode() {
+        ArrayList<MidCode> ans = new ArrayList<>();
+        ans.addAll(eqExps.get(0).getMidCode());
+        if (eqExps.size() == 1) {
+            return ans;
+        }
+        for (int i = 1; i < eqExps.size(); i++) {
+            ArrayList<MidCode> part = eqExps.get(i).getMidCode();
+            MidCode midCodeAns = ans.get(ans.size() - 1);
+            MidCode midCodePart = part.get(part.size() - 1);
+            ans.remove(ans.size() - 1);
+            part.remove(part.size() - 1);
+            ans.addAll(part);
+            String newTemp = Compiler.getNewTemp();
+            MidCode andMidCode = new MidCode(OpType.AND, newTemp, midCodeAns.getLeft(), midCodePart.getLeft());
+            ans.add(andMidCode);
+            ans.add(new MidCode(newTemp));
+        }
+        return ans;
+    }
 }

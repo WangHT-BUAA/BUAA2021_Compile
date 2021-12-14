@@ -14,14 +14,18 @@ public class Compiler {
     public static ArrayList<Integer> lineNumbers;
     public static int point = 0;
 
+    public static Stack<SymbolItem> errorSymbolTable = new Stack<>();
+    public static Stack<SymbolItem> errorFunTable = new Stack<>();
+
     public static int tempNumber = 0;
     public static int arrNumber = 0;
     public static int funcNumber = 0;
     public static int strNumber = 0;
-    public static Stack<SymbolItem> errorSymbolTable = new Stack<>();
-    public static Stack<SymbolItem> errorFunTable = new Stack<>();
-    public static Stack<SymbolItem> symbolTable = new Stack<>();
+    public static int ifNumber = 0;
+    public static int whileNumber = 0;
 
+
+    public static Stack<SymbolItem> symbolTable = new Stack<>();
     public static HashMap<String, String> printStr = new HashMap<>(); // "\n" : str3
 
 
@@ -151,6 +155,18 @@ public class Compiler {
     public static String getNewStr() {
         String ans = "str" + strNumber;
         strNumber++;
+        return ans;
+    }
+
+    public static String getNewWhile() {
+        String ans = "while" + whileNumber;
+        whileNumber++;
+        return ans;
+    }
+
+    public static String getNewIf() {
+        String ans = "if" + ifNumber;
+        ifNumber++;
         return ans;
     }
 

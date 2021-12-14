@@ -120,5 +120,16 @@ enum OpType {
     GETINT,//读入一个整数
     PRINT,//输出
     RETURN, //返回
-    LABEL //跳转的标签
+    LABEL, //跳转的标签
+
+    LSS, // <
+    LEQ, // <=
+    GRE, // >
+    GEQ, // >=
+    EQL, // ==
+    NEQ, // !=
+    AND, // &&
+    OR, // ||
+    BEQ, // 通常用来和0比较 cond结果为0(假)就直接跳走了 beq temp1，$0,label
+    JUMP, //直接跳到某个标签
 }

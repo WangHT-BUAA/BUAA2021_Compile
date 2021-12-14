@@ -409,9 +409,44 @@ public class Stmt {
             Compiler.popSymbolTable(index);//维护符号表，pop掉block里的变量直到恢复到入块之前的大小
             return midCodes;
         } else if (type == 4) {
-            //todo if else
+            //'if' '( Cond ')' Stmt [ 'else' Stmt ]
+            String startName = Compiler.getNewIf(); //if1
+            String endName = startName + "_end";
+            MidCode startLabel = new MidCode(OpType.LABEL, startName);
+            ans.add(startLabel);
+            ArrayList<MidCode> condMidCodes = condIf.getMidCode();
+            MidCode midCodeCond = condMidCodes.get(condMidCodes.size() - 1);
+            condMidCodes.remove(condMidCodes.size() - 1);
+            MidCode beqMidCode = new MidCode(OpType.BEQ, midCodeCond.getLeft(), "$0", endName);
+            ans.addAll(condMidCodes);
+            ans.add(beqMidCode);
+
+            ans.addAll(stmtIf.getMidCode());
+            if (flag == 0) {
+                ans.add(new MidCode(OpType.LABEL, endName));
+            } else {
+                String elseName = startName + "_else_end";
+                ans.add(new MidCode(OpType.JUMP, elseName));
+                ans.add(new MidCode(OpType.LABEL, endName));
+                ans.addAll(stmtElse.getMidCode());
+                ans.add(new MidCode(OpType.LABEL, elseName));
+            }
+            return ans;
         } else if (type == 5) {
             //todo while
+            //'while' '(' Cond ')' Stmt
+            String startName = Compiler.getNewWhile();
+            String endName = startName + "_end";
+            ans.add(new MidCode(OpType.LABEL, startName));
+            ArrayList<MidCode> condMidCodes = condWhile.getMidCode();
+            MidCode midCodeCond = condMidCodes.get(condMidCodes.size() - 1);
+            condMidCodes.remove(condMidCodes.size() - 1);
+            ans.addAll(condMidCodes);
+            ans.add(new MidCode(OpType.BEQ, midCodeCond.getLeft(), "$0", endName));
+            ans.addAll(stmtWhile.getMidCode());
+            ans.add(new MidCode(OpType.JUMP, startName));
+            ans.add(new MidCode(OpType.LABEL, endName));
+            return ans;
         } else if (type == 6) {
             //todo break continue
         } else if (type == 7) {
