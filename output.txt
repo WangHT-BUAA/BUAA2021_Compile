@@ -1,81 +1,11 @@
 INTTK int
-<FuncType>
-IDENFR func
+MAINTK main
 LPARENT (
-INTTK int
-IDENFR a
-<FuncFParam>
-COMMA ,
-INTTK int
-IDENFR b
-<FuncFParam>
-COMMA ,
-INTTK int
-IDENFR c
-LBRACK [
-RBRACK ]
-<FuncFParam>
-<FuncFParams>
 RPARENT )
 LBRACE {
 INTTK int
-IDENFR d
-LBRACK [
-INTCON 3
-<Number>
-<PrimaryExp>
-<UnaryExp>
-<MulExp>
-<AddExp>
-<ConstExp>
-RBRACK ]
-<VarDef>
-SEMICN ;
-<VarDecl>
-INTTK int
-IDENFR e
-<VarDef>
-SEMICN ;
-<VarDecl>
-INTTK int
-IDENFR f
-<VarDef>
-SEMICN ;
-<VarDecl>
-IDENFR func
-LPARENT (
-IDENFR e
-<LVal>
-<PrimaryExp>
-<UnaryExp>
-<MulExp>
-<AddExp>
-<Exp>
-COMMA ,
-IDENFR f
-<LVal>
-<PrimaryExp>
-<UnaryExp>
-<MulExp>
-<AddExp>
-<Exp>
-COMMA ,
-IDENFR d
-<LVal>
-<PrimaryExp>
-<UnaryExp>
-<MulExp>
-<AddExp>
-<Exp>
-<FuncRParams>
-RPARENT )
-<UnaryExp>
-<MulExp>
-<AddExp>
-<Exp>
-SEMICN ;
-<Stmt>
-RETURNTK return
+IDENFR a
+ASSIGN =
 INTCON 0
 <Number>
 <PrimaryExp>
@@ -83,16 +13,100 @@ INTCON 0
 <MulExp>
 <AddExp>
 <Exp>
+<InitVal>
+<VarDef>
+SEMICN ;
+<VarDecl>
+WHILETK while
+LPARENT (
+IDENFR a
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+LSS <
+INTCON 6
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+<Cond>
+RPARENT )
+LBRACE {
+IDENFR a
+<LVal>
+ASSIGN =
+IDENFR a
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+PLUS +
+INTCON 1
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
+SEMICN ;
+<Stmt>
+IFTK if
+LPARENT (
+IDENFR a
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+LSS <
+INTCON 0
+<Number>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<RelExp>
+<EqExp>
+<LAndExp>
+<LOrExp>
+<Cond>
+RPARENT )
+LBRACE {
+BREAKTK break
 SEMICN ;
 <Stmt>
 RBRACE }
 <Block>
-<FuncDef>
-INTTK int
-MAINTK main
+<Stmt>
+<Stmt>
+RBRACE }
+<Block>
+<Stmt>
+<Stmt>
+PRINTFTK printf
 LPARENT (
+STRCON "%d"
+COMMA ,
+IDENFR a
+<LVal>
+<PrimaryExp>
+<UnaryExp>
+<MulExp>
+<AddExp>
+<Exp>
 RPARENT )
-LBRACE {
+SEMICN ;
+<Stmt>
 RETURNTK return
 INTCON 0
 <Number>

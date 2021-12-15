@@ -8,11 +8,11 @@ public class BlockItem {
     private Stmt stmt;
     private int type = 0;
 
-    public BlockItem(int blockNum,boolean isInCircle,int noReturn) {
-        success = doGrammarAnalysis(blockNum,isInCircle,noReturn);
+    public BlockItem(int blockNum, boolean isInCircle, int noReturn) {
+        success = doGrammarAnalysis(blockNum, isInCircle, noReturn);
     }
 
-    private boolean doGrammarAnalysis(int blockNum,boolean isInCircle,int noReturn) {
+    private boolean doGrammarAnalysis(int blockNum, boolean isInCircle, int noReturn) {
         int currentPoint = Compiler.point;
         decl = new Decl(blockNum);
         if (decl.isSuccess()) {
@@ -20,7 +20,7 @@ public class BlockItem {
             return true;
         }
         Compiler.point = currentPoint;
-        stmt = new Stmt(blockNum,isInCircle,noReturn);
+        stmt = new Stmt(blockNum, isInCircle, noReturn);
         if (stmt.isSuccess()) {
             type = 2;
             return true;
@@ -57,12 +57,12 @@ public class BlockItem {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String whileLabel) {
         ArrayList<MidCode> ans = new ArrayList<>();
         if (type == 1) {
             ans.addAll(decl.getMidCode());
         } else if (type == 2) {
-            ans.addAll(stmt.getMidCode());
+            ans.addAll(stmt.getMidCode(whileLabel));
         }
         return ans;
     }

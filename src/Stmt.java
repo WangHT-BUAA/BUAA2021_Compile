@@ -382,7 +382,7 @@ public class Stmt {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String whileLabel) {
         ArrayList<MidCode> ans = new ArrayList<>();
         if (type == 1) {
             ArrayList<MidCode> partLVal = lValEq.getMidCode();
@@ -405,7 +405,7 @@ public class Stmt {
             return ans;
         } else if (type == 3) {
             int index = Compiler.symbolTable.size();
-            ArrayList<MidCode> midCodes = block.getMidCode();
+            ArrayList<MidCode> midCodes = block.getMidCode(whileLabel);
             Compiler.popSymbolTable(index);//维护符号表，pop掉block里的变量直到恢复到入块之前的大小
             return midCodes;
         } else if (type == 4) {
@@ -421,14 +421,14 @@ public class Stmt {
             ans.addAll(condMidCodes);
             ans.add(beqMidCode);
 
-            ans.addAll(stmtIf.getMidCode());
+            ans.addAll(stmtIf.getMidCode(whileLabel));
             if (flag == 0) {
                 ans.add(new MidCode(OpType.LABEL, endName));
             } else {
                 String elseName = startName + "_else_end";
                 ans.add(new MidCode(OpType.JUMP, elseName));
                 ans.add(new MidCode(OpType.LABEL, endName));
-                ans.addAll(stmtElse.getMidCode());
+                ans.addAll(stmtElse.getMidCode(whileLabel));
                 ans.add(new MidCode(OpType.LABEL, elseName));
             }
             return ans;
@@ -443,12 +443,21 @@ public class Stmt {
             condMidCodes.remove(condMidCodes.size() - 1);
             ans.addAll(condMidCodes);
             ans.add(new MidCode(OpType.BEQ, midCodeCond.getLeft(), "$0", endName));
-            ans.addAll(stmtWhile.getMidCode());
+            ans.addAll(stmtWhile.getMidCode(startName));
             ans.add(new MidCode(OpType.JUMP, startName));
             ans.add(new MidCode(OpType.LABEL, endName));
             return ans;
         } else if (type == 6) {
             //todo break continue
+            if (whileLabel == null) {
+                System.out.println("error in stmt : break & continue");
+            }
+            if (node.getSymbolName().equals("break")) {
+                ans.add(new MidCode(OpType.JUMP, whileLabel + "_end"));
+            } else {
+                ans.add(new MidCode(OpType.JUMP, whileLabel));
+            }
+            return ans;
         } else if (type == 7) {
             if (expReturn.isSuccess()) {
                 ArrayList<MidCode> partExp = expReturn.getMidCode();

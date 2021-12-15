@@ -65,7 +65,7 @@ public class MainFuncDef {
         MidCode mainLabel = new MidCode(OpType.LABEL, "Main");
         ans.add(mainLabel);
         int index = Compiler.symbolTable.size();
-        ans.addAll(block.getMidCode());
+        ans.addAll(block.getMidCode(null));
         ans.add(ans.size() - 1, new MidCode(OpType.LABEL, "MainEnd"));
         Compiler.popSymbolTable(index);//维护符号表，pop掉block里的变量直到恢复到入块之前的大小
         return ans;

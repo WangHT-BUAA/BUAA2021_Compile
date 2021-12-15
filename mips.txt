@@ -1,29 +1,73 @@
 .data
-array: .space 12
+array: .space 36
+str0: .asciiz ""
 .text
 Main:
 li $s0 , 0
+li $t0 , 4
+sw $s0 , array($t0)
+li $t0 , 4
+lw $s0 , array($t0)
+li $t0 , 0
+sw $s0 , array($t0)
+while0:
+li $s0 , 6
 li $t0 , 8
+sw $s0 , array($t0)
+li $t0 , 0
+lw $t1 , array($t0)
+li $t0 , 8
+lw $t2 , array($t0)
+slt $s0 , $t1 , $t2
+li $t0 , 12
+sw $s0 , array($t0)
+li $t0 , 12
+lw $t1 , array($t0)
+beq $t1 , $0 , while0_end
+li $s0 , 1
+li $t0 , 16
+sw $s0 , array($t0)
+li $t0 , 0
+lw $t1 , array($t0)
+li $t0 , 16
+lw $t2 , array($t0)
+add $s0 , $t1 , $t2
+li $t0 , 20
+sw $s0 , array($t0)
+li $t0 , 20
+lw $s0 , array($t0)
+li $t0 , 0
+sw $s0 , array($t0)
+if0:
+li $s0 , 0
+li $t0 , 24
+sw $s0 , array($t0)
+li $t0 , 0
+lw $t1 , array($t0)
+li $t0 , 24
+lw $t2 , array($t0)
+slt $s0 , $t1 , $t2
+li $t0 , 28
+sw $s0 , array($t0)
+li $t0 , 28
+lw $t1 , array($t0)
+beq $t1 , $0 , if0_end
+j while0_end
+if0_end:
+j while0
+while0_end:
+la $a0 , str0
+li $v0 , 4
+syscall
+li $t0 , 0
+lw $a0 , array($t0)
+li $v0 , 1
+syscall
+li $s0 , 0
+li $t0 , 32
 sw $s0 , array($t0)
 li $v0 , 10
 syscall
-li $t0 , 8
+li $t0 , 32
 lw $v0 , array($t0)
-jr $ra
-func0:
-li $s0 , 1
-li $t0 , 0
-sw $s0 , array($t0)
-li $t0 , 0
-
-lw $v0 , array($t0)
-jr $ra
-jr $ra
-func1:
-li $s0 , 2
-li $t0 , 4
-sw $s0 , array($t0)
-li $t0 , 4
-lw $v0 , array($t0)
-jr $ra
 jr $ra

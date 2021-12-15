@@ -98,7 +98,7 @@ public class FuncDef {
             funcItem.addParam(midCode.getLeft()); //把形参加入到函数symbol的属性中
         }
         ans.addAll(paraMidCode);
-        ans.addAll(block.getMidCode());
+        ans.addAll(block.getMidCode(null));
         for (int i = index + 1; i < Compiler.symbolTable.size(); i++) {
             funcItem.addTemp(Compiler.symbolTable.get(i).getName());
         }

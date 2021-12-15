@@ -101,11 +101,90 @@ public class MipsGenerator {
                 case LABEL:
                     dealLABELMidCode(midCode);
                     break;
+                case LSS:
+                    dealLSSMidCode(midCode);
+                    break;
+                case LEQ:
+
+                    break;
+                case GRE:
+
+                    break;
+                case GEQ:
+
+                    break;
+                case EQL:
+
+                    break;
+                case NEQ:
+
+                    break;
+                case AND:
+
+                    break;
+                case OR:
+
+                    break;
+                case BEQ:
+                    dealBEQMidCode(midCode);
+                    break;
+                case JUMP:
+                    dealJUMPMidCode(midCode);
+                    break;
                 default:
                     System.out.println("生成mips代码有误");
                     break;
             }
         }
+    }
+
+    /*
+        String numLeft = getNumber(midCode.getLeft());
+        String numRight1 = getNumber(midCode.getRight1());
+        String numRight2 = getNumber(midCode.getRight2());
+        mipsCodes.add(new MipsCode(MipsOp.li, "$t0", numRight1));
+        mipsCodes.add(new MipsCode(MipsOp.lw, "$t1", "array($t0)"));
+        mipsCodes.add(new MipsCode(MipsOp.li, "$t0", numRight2));
+        mipsCodes.add(new MipsCode(MipsOp.lw, "$t2", "array($t0)"));
+        mipsCodes.add(new MipsCode(MipsOp.add, "$s0", "$t1", "$t2"));
+        mipsCodes.add(new MipsCode(MipsOp.li, "$t0", numLeft));
+        mipsCodes.add(new MipsCode(MipsOp.sw, "$s0", "array($t0)"));
+     */
+    private void dealLEQMidCode(MidCode midCode) {
+        String numLeft = getNumber(midCode.getLeft());
+        String numRight1 = getNumber(midCode.getRight1());
+        String numRight2 = getNumber(midCode.getRight2());
+    }
+
+    private void dealLSSMidCode(MidCode midCode) {
+        String numLeft = getNumber(midCode.getLeft());
+        String numRight1 = getNumber(midCode.getRight1());
+        String numRight2 = getNumber(midCode.getRight2());
+        mipsCodes.add(new MipsCode(MipsOp.li, "$t0", numRight1));
+        mipsCodes.add(new MipsCode(MipsOp.lw, "$t1", "array($t0)"));
+        mipsCodes.add(new MipsCode(MipsOp.li, "$t0", numRight2));
+        mipsCodes.add(new MipsCode(MipsOp.lw, "$t2", "array($t0)"));
+        mipsCodes.add(new MipsCode(MipsOp.slt, "$s0", "$t1", "$t2"));
+        mipsCodes.add(new MipsCode(MipsOp.li, "$t0", numLeft));
+        mipsCodes.add(new MipsCode(MipsOp.sw, "$s0", "array($t0)"));
+    }
+
+    private void dealBEQMidCode(MidCode midCode) {
+        String numLeft = getNumber(midCode.getLeft());
+        mipsCodes.add(new MipsCode(MipsOp.li, "$t0", numLeft));
+        mipsCodes.add(new MipsCode(MipsOp.lw, "$t1", "array($t0)"));
+        String right = midCode.getRight1();
+        String label = midCode.getRight2();
+        if (right.equals("$0")) {
+            mipsCodes.add(new MipsCode(MipsOp.beq, "$t1", "$0", label));
+        } else {
+            //如果不是和0比较
+        }
+    }
+
+    private void dealJUMPMidCode(MidCode midCode) {
+        String label = midCode.getLeft();
+        mipsCodes.add(new MipsCode(MipsOp.j, label));
     }
 
     private void dealLABELMidCode(MidCode midCode) {
@@ -389,5 +468,9 @@ enum MipsOp {
     la,
     mfhi,
     jr,
-    jal
+    jal,
+    j,
+    beq,
+    slt,
+
 }

@@ -70,11 +70,11 @@ public class Block {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String whileLabel) {
         ArrayList<MidCode> ans = new ArrayList<>();
 
         for (BlockItem blockItem : blockItems) {
-            ans.addAll(blockItem.getMidCode());
+            ans.addAll(blockItem.getMidCode(whileLabel));
         }
 
         return ans;
