@@ -26,8 +26,12 @@ public class ConstExp {
         ans.append("<ConstExp>\n");
         return ans.toString();
     }
+    //useless
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
+        return addExp.getMidCode(lastFunc);
+    }
 
-    public ArrayList<MidCode> getMidCode() {
-        return addExp.getMidCode();
+    public int getArrCount() {
+        return addExp.getArrCount();
     }
 }

@@ -35,7 +35,11 @@ public class Exp {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
-        return addExp.getMidCode();
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
+        return addExp.getMidCode(lastFunc);
+    }
+
+    public int getArrCount() {
+        return addExp.getArrCount();
     }
 }

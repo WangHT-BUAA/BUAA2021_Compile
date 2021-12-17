@@ -76,14 +76,14 @@ public class AddExp {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
-        ans.addAll(mulExps.get(0).getMidCode());
+        ans.addAll(mulExps.get(0).getMidCode(lastFunc));
         if (mulExps.size() == 1) {
             return ans;
         }
         for (int i = 1; i < mulExps.size(); i++) {
-            ArrayList<MidCode> part = mulExps.get(i).getMidCode();
+            ArrayList<MidCode> part = mulExps.get(i).getMidCode(lastFunc);
             MidCode midCodeAns = ans.get(ans.size() - 1);
             MidCode midCodePart = part.get(part.size() - 1);
             ans.remove(ans.size() - 1);
@@ -99,6 +99,19 @@ public class AddExp {
                 MidCode subMidCode = new MidCode(OpType.SUB, newTemp, midCodeAns.getLeft(), midCodePart.getLeft());
                 ans.add(subMidCode);
                 ans.add(new MidCode(newTemp));
+            }
+        }
+        return ans;
+    }
+
+    public int getArrCount() {
+        int ans = mulExps.get(0).getArrCount();
+        for (int i = 1; i < mulExps.size(); i++) {
+            String character = characters.get(i - 1);
+            if (character.equals("PLUS")) {
+                ans += mulExps.get(i).getArrCount();
+            } else if (character.equals("MINU")) {
+                ans -= mulExps.get(i).getArrCount();
             }
         }
         return ans;

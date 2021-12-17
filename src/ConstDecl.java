@@ -66,10 +66,10 @@ public class ConstDecl {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         for (ConstDef constDef : constDefs) {
-            ans.addAll(constDef.getMidCode());
+            ans.addAll(constDef.getMidCode(lastFunc));
         }
         return ans;
     }

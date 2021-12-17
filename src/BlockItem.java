@@ -57,12 +57,12 @@ public class BlockItem {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode(String whileLabel) {
+    public ArrayList<MidCode> getMidCode(String whileLabel,String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         if (type == 1) {
-            ans.addAll(decl.getMidCode());
+            ans.addAll(decl.getMidCode(lastFunc));
         } else if (type == 2) {
-            ans.addAll(stmt.getMidCode(whileLabel));
+            ans.addAll(stmt.getMidCode(whileLabel,lastFunc));
         }
         return ans;
     }

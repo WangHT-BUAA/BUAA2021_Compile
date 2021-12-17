@@ -77,7 +77,7 @@ public class LVal {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         SymbolItem item = Compiler.getSymbolItem(this.initName);
         if (exps.size() == 0) {
@@ -85,9 +85,27 @@ public class LVal {
             assert item != null;
             ans.add(new MidCode(item.getName()));
             return ans;
+        } else if (exps.size() == 1) {
+            ans.addAll(exps.get(0).getMidCode(lastFunc));
         }
-        //todo
+        
 
         return ans;
+    }
+
+    public int getArrCount() {
+        SymbolItem item = Compiler.getConstItem(this.initName);
+        if (exps.size() == 0) {
+            //System.out.println(item.getInitName() + " " + item.getConstNum());
+            return item.getConstNum();
+        } else if (exps.size() == 1) {
+            int num = exps.get(0).getArrCount();
+            return item.getConstNumAt(num);
+        } else if (exps.size() == 2) {
+            int num1 = exps.get(0).getArrCount();
+            int num2 = exps.get(1).getArrCount();
+            return item.getConstNumAt(num1, num2);
+        }
+        return 0;
     }
 }

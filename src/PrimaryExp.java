@@ -78,15 +78,26 @@ public class PrimaryExp {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         if (type == 1) {
-            ans.addAll(exp.getMidCode());
+            ans.addAll(exp.getMidCode(lastFunc));
         } else if (type == 2) {
             ans.addAll(lVal.getMidCode());
         } else if (type == 3) {
             ans.addAll(number.getMidCode());
         }
         return ans;
+    }
+
+    public int getArrCount() {
+        if (type == 1) {
+            return exp.getArrCount();
+        } else if (type == 2) {
+            return lVal.getArrCount();
+        } else if (type == 3) {
+            return number.getArrCount();
+        }
+        return 0;
     }
 }

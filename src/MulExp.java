@@ -77,14 +77,14 @@ public class MulExp {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
-        ans.addAll(unaryExps.get(0).getMidCode());
+        ans.addAll(unaryExps.get(0).getMidCode(lastFunc));
         if (unaryExps.size() == 1) {
             return ans;
         }
         for (int i = 1; i < unaryExps.size(); i++) {
-            ArrayList<MidCode> part = unaryExps.get(i).getMidCode();
+            ArrayList<MidCode> part = unaryExps.get(i).getMidCode(lastFunc);
             MidCode midCodeAns = ans.get(ans.size() - 1);
             MidCode midCodePart = part.get(part.size() - 1);
             ans.remove(ans.size() - 1);
@@ -104,6 +104,21 @@ public class MulExp {
                 MidCode modMidCode = new MidCode(OpType.MOD, newTemp, midCodeAns.getLeft(), midCodePart.getLeft());
                 ans.add(modMidCode);
                 ans.add(new MidCode(newTemp));
+            }
+        }
+        return ans;
+    }
+
+    public int getArrCount() {
+        int ans = unaryExps.get(0).getArrCount();
+        for (int i = 1; i < unaryExps.size(); i++) {
+            String character = characters.get(i - 1);
+            if (character.equals("MULT")) {
+                ans *= unaryExps.get(i).getArrCount();
+            } else if (character.equals("DIV")) {
+                ans /= unaryExps.get(i).getArrCount();
+            } else if (character.equals("MOD")) {
+                ans %= unaryExps.get(i).getArrCount();
             }
         }
         return ans;

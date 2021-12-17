@@ -41,4 +41,8 @@ public class Number {
         ans.add(new MidCode(newTemp));
         return ans;
     }
+
+    public int getArrCount() {
+        return Integer.parseInt(number);
+    }
 }

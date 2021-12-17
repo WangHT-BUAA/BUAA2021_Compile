@@ -68,13 +68,15 @@ public class InitVal {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         if (exp.isSuccess()) {
-            return exp.getMidCode();
+            return exp.getMidCode(lastFunc);
         } else {
             //多维
-
+            for (InitVal initVal : initVals) {
+                ans.addAll(initVal.getMidCode(lastFunc));
+            }
             return ans;
         }
     }

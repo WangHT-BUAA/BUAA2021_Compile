@@ -89,19 +89,22 @@ public class FuncDef {
         String initName = ident.getSymbolName();
         String name = Compiler.getNewFunc();
         SymbolItem funcItem = new SymbolItem("func", initName, name, type); //函数定义声明
-        Compiler.pushItemStack(funcItem); //加入符号表
+        Compiler.pushGlobalItem(funcItem); //加入global符号表
         int index = Compiler.symbolTable.size();
         MidCode funcMidCode = new MidCode(OpType.FUNC, name);
         ans.add(funcMidCode);
+
+        Compiler.clearTempNum();
         ArrayList<MidCode> paraMidCode = funcFParams.getMidCode(); //所有的形参
         for (MidCode midCode : paraMidCode) {
             funcItem.addParam(midCode.getLeft()); //把形参加入到函数symbol的属性中
         }
         ans.addAll(paraMidCode);
-        ans.addAll(block.getMidCode(null));
+        ans.addAll(block.getMidCode(null, name));
         for (int i = index + 1; i < Compiler.symbolTable.size(); i++) {
             funcItem.addTemp(Compiler.symbolTable.get(i).getName());
         }
+        funcItem.setBlockSize(Compiler.tempNumber);
         Compiler.popSymbolTable(index);//维护符号表，pop掉block里的变量直到恢复到入块之前的大小
         ans.add(new MidCode(OpType.FUNC_END, name));
         return ans;

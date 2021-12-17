@@ -18,14 +18,17 @@ public class Compiler {
     public static Stack<SymbolItem> errorFunTable = new Stack<>();
 
     public static int tempNumber = 0;
+    public static int globalNumber = 0;
     public static int arrNumber = 0;
     public static int funcNumber = 0;
     public static int strNumber = 0;
     public static int ifNumber = 0;
     public static int whileNumber = 0;
+    public static int labelNumber = 0;
 
 
     public static Stack<SymbolItem> symbolTable = new Stack<>();
+    public static Stack<SymbolItem> globalSymbolTable = new Stack<>();
     public static HashMap<String, String> printStr = new HashMap<>(); // "\n" : str3
 
 
@@ -134,17 +137,16 @@ public class Compiler {
         return lineNumbers.get(point);
     }
 
+    public static void clearTempNum() {
+        tempNumber = 0;
+    }
+
     public static String getNewTemp() {
         String ans = "temp" + tempNumber;
         tempNumber++;
         return ans;
     }
 
-    public static String getNewArr() {
-        String ans = "arr" + arrNumber;
-        arrNumber++;
-        return ans;
-    }
 
     public static String getNewFunc() {
         String ans = "func" + funcNumber;
@@ -170,8 +172,32 @@ public class Compiler {
         return ans;
     }
 
+    public static String getNewLabel() {
+        String ans = "label" + labelNumber;
+        labelNumber++;
+        return ans;
+    }
+
+    public static String getNewGlobal() {
+        String ans = "global" + globalNumber;
+        globalNumber++;
+        return ans;
+    }
+
+    public static void addTempNum(int num) {
+        tempNumber += num;
+    }
+
+    public static void addGlobalNum(int num) {
+        globalNumber += num;
+    }
+
     public static void pushItemStack(SymbolItem symbolItem) {
         symbolTable.push(symbolItem);
+    }
+
+    public static void pushGlobalItem(SymbolItem symbolItem) {
+        globalSymbolTable.push(symbolItem);
     }
 
     public static SymbolItem getSymbolItem(String initName) {
@@ -181,14 +207,45 @@ public class Compiler {
                 return part;
             }
         }
+        for (int i = globalSymbolTable.size() - 1; i >= 0; i--) {
+            SymbolItem part = globalSymbolTable.get(i);
+            if (part.getInitName().equals(initName)) {
+                return part;
+            }
+        }
         return null;
-        // todo : maybe error
+    }
+
+    public static SymbolItem getConstItem(String initName) {
+        for (int i = symbolTable.size() - 1; i >= 0; i--) {
+            SymbolItem part = symbolTable.get(i);
+            if (part.getInitName().equals(initName) && part.isConst()) {
+                return part;
+            }
+        }
+        for (int i = globalSymbolTable.size() - 1; i >= 0; i--) {
+            SymbolItem part = globalSymbolTable.get(i);
+            if (part.getInitName().equals(initName) && part.isConst()) {
+                return part;
+            }
+        }
+        return null;
     }
 
     public static void popSymbolTable(int index) {
         while (symbolTable.size() > index) {
             symbolTable.pop();
         }
+    }
+
+    public static int getFuncMax(String funcName) {
+        for (int i = globalSymbolTable.size() - 1; i >= 0; i--) {
+            SymbolItem part = globalSymbolTable.get(i);
+            if (part.getName().equals(funcName)) {
+                return part.getBlockSize();
+            }
+        }
+        return 0;
     }
 
     // todo errors
@@ -232,5 +289,6 @@ public class Compiler {
             errorSymbolTable.pop();
         }
     }
+
 
 }

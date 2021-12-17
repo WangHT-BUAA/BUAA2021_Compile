@@ -61,14 +61,14 @@ public class RelExp {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
-        ans.addAll(addExps.get(0).getMidCode());
+        ans.addAll(addExps.get(0).getMidCode(lastFunc));
         if (addExps.size() == 1) {
             return ans;
         }
         for (int i = 1; i < addExps.size(); i++) {
-            ArrayList<MidCode> part = addExps.get(i).getMidCode();
+            ArrayList<MidCode> part = addExps.get(i).getMidCode(lastFunc);
             MidCode midCodeAns = ans.get(ans.size() - 1);
             MidCode midCodePart = part.get(part.size() - 1);
             ans.remove(ans.size() - 1);

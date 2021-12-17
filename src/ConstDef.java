@@ -51,7 +51,7 @@ public class ConstDef {
                 Compiler.point = currentPoint;
                 return false;
             }
-            if (Compiler.getErrorSymbolItemInBlock(node.getSymbolName(),blockNum) != null) {
+            if (Compiler.getErrorSymbolItemInBlock(node.getSymbolName(), blockNum) != null) {
                 GrammarAnalysis.addError('b', Compiler.getLine()); //名字重定义了
             }
             SymbolItem constSymbolItem = new SymbolItem("var", node.getSymbolName(), 0, true);
@@ -80,37 +80,88 @@ public class ConstDef {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         String initName = node.getSymbolName();
         switch (constExps.size()) {
-            case 0:
-                String newName = Compiler.getNewTemp();
-                SymbolItem constItem = new SymbolItem("int", initName, newName, true);
-                Compiler.pushItemStack(constItem); //常量压入符号表
-                ans.addAll(constInitVal.getMidCode()); //先把等号右边的加进来 剩下的最后一项应该是个名字
-                int size = ans.size();
-                MidCode last = ans.get(size - 1);
-                ans.remove(size - 1);
+            case 0: {
+                String newName;
+                SymbolItem constItem;
+                if (Decl.isGlobal) {
+                    newName = Compiler.getNewGlobal();
+                    constItem = new SymbolItem("int", initName, newName, true);
+                    Compiler.pushGlobalItem(constItem);
+                } else {
+                    newName = Compiler.getNewTemp();
+                    constItem = new SymbolItem("int", initName, newName, true);
+                    Compiler.pushItemStack(constItem); //常量压入符号表
+                }
+                int value = constInitVal.getArrCounts().get(0);
+                //ArrayList<MidCode> midCodesInit = constInitVal.getMidCode(lastFunc);
+                constItem.setConstNum(value);
                 MidCode defMidCode = new MidCode(OpType.CONST, newName, true); //中间代码先定义
                 ans.add(defMidCode);
-                MidCode assignMidCode = new MidCode(OpType.ASSIGN, newName, last.getLeft());//再赋值
+                MidCode assignMidCode = new MidCode(OpType.ASSIGN, newName, value);//再赋值 直接赋值一个常数
                 ans.add(assignMidCode);
                 break;
-            case 1:
-                ArrayList<MidCode> partConstInitVal = constInitVal.getMidCode();
-                //todo
-                ArrayList<MidCode> partConstExp = constExps.get(0).getMidCode();
-                MidCode midCodePart = partConstExp.get(partConstExp.size() - 1);
-                partConstExp.remove(partConstExp.size() - 1);
-                ans.addAll(partConstExp);
-                String newArrName = Compiler.getNewArr();
-                SymbolItem constArrItem = new SymbolItem("arr", initName, newArrName, true, midCodePart.getLeft());
-
+            }
+            case 1: {
+                String newName;
+                SymbolItem constItem;
+                int num = constExps.get(0).getArrCount();
+                if (Decl.isGlobal) {
+                    newName = Compiler.getNewGlobal();
+                    constItem = new SymbolItem("arr", initName, newName, true, num);
+                    Compiler.pushGlobalItem(constItem);
+                } else {
+                    newName = Compiler.getNewTemp();
+                    constItem = new SymbolItem("arr", initName, newName, true, num);
+                    Compiler.pushItemStack(constItem); //常量压入符号表
+                }
+                ArrayList<Integer> values = constInitVal.getArrCounts();
+                constItem.setConstNums(values);
+                for (int i = 0; i < values.size(); i++) {
+                    int value = values.get(i);
+                    ans.add(new MidCode(OpType.ASSIGN, newName, value));
+                    if (i < values.size() - 1) {
+                        if (Decl.isGlobal) {
+                            newName = Compiler.getNewGlobal();
+                        } else {
+                            newName = Compiler.getNewTemp();
+                        }
+                    }
+                }
                 break;
-            case 2:
-
+            }
+            case 2: {
+                String newName;
+                SymbolItem constItem;
+                int num1 = constExps.get(0).getArrCount();
+                int num2 = constExps.get(1).getArrCount();
+                if (Decl.isGlobal) {
+                    newName = Compiler.getNewGlobal();
+                    constItem = new SymbolItem("arr", initName, newName, true, num1, num2);
+                    Compiler.pushGlobalItem(constItem);
+                } else {
+                    newName = Compiler.getNewTemp();
+                    constItem = new SymbolItem("arr", initName, newName, true, num1, num2);
+                    Compiler.pushItemStack(constItem); //常量压入符号表
+                }
+                ArrayList<Integer> values = constInitVal.getArrCounts();
+                constItem.setConstNums(values);
+                for (int i = 0; i < values.size(); i++) {
+                    int value = values.get(i);
+                    ans.add(new MidCode(OpType.ASSIGN, newName, value));
+                    if (i < values.size() - 1) {
+                        if (Decl.isGlobal) {
+                            newName = Compiler.getNewGlobal();
+                        } else {
+                            newName = Compiler.getNewTemp();
+                        }
+                    }
+                }
                 break;
+            }
         }
         return ans;
     }

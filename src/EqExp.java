@@ -59,14 +59,14 @@ public class EqExp {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
-        ans.addAll(relExps.get(0).getMidCode());
+        ans.addAll(relExps.get(0).getMidCode(lastFunc));
         if (relExps.size() == 1) {
             return ans;
         }
         for (int i = 1; i < relExps.size(); i++) {
-            ArrayList<MidCode> part = relExps.get(i).getMidCode();
+            ArrayList<MidCode> part = relExps.get(i).getMidCode(lastFunc);
             MidCode midCodeAns = ans.get(ans.size() - 1);
             MidCode midCodePart = part.get(part.size() - 1);
             ans.remove(ans.size() - 1);

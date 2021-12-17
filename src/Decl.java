@@ -7,6 +7,8 @@ public class Decl {
     private ConstDecl constDecl;
     private VarDecl varDecl;
 
+    public static boolean isGlobal = false;
+
     private int type = 0;
 
     public Decl(int blockNum) {
@@ -46,12 +48,12 @@ public class Decl {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         if (type == 1) {
-            ans.addAll(constDecl.getMidCode());
+            ans.addAll(constDecl.getMidCode(lastFunc));
         } else if (type == 2) {
-            ans.addAll(varDecl.getMidCode());
+            ans.addAll(varDecl.getMidCode(lastFunc));
         }
         return ans;
     }

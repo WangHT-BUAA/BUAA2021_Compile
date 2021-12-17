@@ -31,7 +31,7 @@ public class MainFuncDef {
             GrammarAnalysis.addError('j', Compiler.getLine());
         }
         Compiler.point++;
-        block = new Block(Compiler.errorSymbolTable.size(),false,2);
+        block = new Block(Compiler.errorSymbolTable.size(), false, 2);
         if (block.isSuccess()) {
             int type = block.getLastStmtType();
             if (type != 8) {
@@ -65,7 +65,12 @@ public class MainFuncDef {
         MidCode mainLabel = new MidCode(OpType.LABEL, "Main");
         ans.add(mainLabel);
         int index = Compiler.symbolTable.size();
-        ans.addAll(block.getMidCode(null));
+
+        Compiler.clearTempNum();
+        ans.addAll(block.getMidCode(null, "main"));
+        SymbolItem mainItem = new SymbolItem("func", "main", "main", "int");
+        mainItem.setBlockSize(Compiler.tempNumber);
+        Compiler.pushGlobalItem(mainItem);
         ans.add(ans.size() - 1, new MidCode(OpType.LABEL, "MainEnd"));
         Compiler.popSymbolTable(index);//维护符号表，pop掉block里的变量直到恢复到入块之前的大小
         return ans;

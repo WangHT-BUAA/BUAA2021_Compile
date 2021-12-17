@@ -1,25 +1,22 @@
-str0 : 
+ASSIGN global0 1
+ASSIGN global1 2
+ASSIGN global2 3
+ASSIGN global3 4
 LABEL Main
 VAR temp0
-IMM temp1 0
+IMM temp1 5
 ASSIGN temp0 temp1
-LABEL while0
-IMM temp2 6
-LSS temp3 temp0 temp2
-BEQ temp3 $0 while0_end
-IMM temp4 1
-ADD temp5 temp0 temp4
-ASSIGN temp0 temp5
-LABEL if0
-IMM temp6 0
-LSS temp7 temp0 temp6
-BEQ temp7 $0 if0_end
-JUMP while0_end
-LABEL if0_end
-JUMP while0
-LABEL while0_end
-PRINT str0 str
-PRINT temp0 int
-IMM temp8 0
+PUSH ra main
+CHANGE_SP main -
+CALL func0
+CHANGE_SP main +
+POP ra main
+ASSIGN temp2 RET
+ASSIGN temp3 temp0
+IMM temp4 0
 LABEL MainEnd
-RETURN temp8
+RETURN temp4
+FUNC func0
+IMM temp0 1
+RETURN temp0
+FUNC_END func0

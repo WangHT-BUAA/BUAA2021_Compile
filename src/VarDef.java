@@ -46,7 +46,7 @@ public class VarDef {
                 return false;
             }
         }
-        if (Compiler.getErrorSymbolItemInBlock(initName,blockNum) != null) {
+        if (Compiler.getErrorSymbolItemInBlock(initName, blockNum) != null) {
             GrammarAnalysis.addError('b', Compiler.getLine()); //重定义了
         }
         SymbolItem varSymbolItem = new SymbolItem("var", initName, constExps.size(), false);
@@ -75,17 +75,25 @@ public class VarDef {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         if (constExps.size() == 0) {
             //0维
-            String name = Compiler.getNewTemp();
-            SymbolItem item = new SymbolItem("var", initName, name, false);
-            Compiler.pushItemStack(item);
+            String name;
+            SymbolItem item;
+            if (Decl.isGlobal) {
+                name = Compiler.getNewGlobal();
+                item = new SymbolItem("var", initName, name, false);
+                Compiler.pushGlobalItem(item);
+            } else {
+                name = Compiler.getNewTemp();
+                item = new SymbolItem("var", initName, name, false);
+                Compiler.pushItemStack(item);
+            }
             MidCode defMidCode = new MidCode(OpType.VAR, name, false);// 定义
             ans.add(defMidCode);
             if (type == 1) {
-                ArrayList<MidCode> partInitVal = initVal.getMidCode();
+                ArrayList<MidCode> partInitVal = initVal.getMidCode(lastFunc);
                 MidCode midCodeInitVal = partInitVal.get(partInitVal.size() - 1);
                 partInitVal.remove(partInitVal.size() - 1);
                 MidCode assignMidCode = new MidCode(OpType.ASSIGN, name, midCodeInitVal.getLeft());
@@ -95,8 +103,101 @@ public class VarDef {
             return ans;
         } else if (constExps.size() == 1) {
             //1维
+            int num = constExps.get(0).getArrCount();
+            String name;
+            SymbolItem item;
+            if (Decl.isGlobal) {
+                name = Compiler.getNewGlobal();
+                item = new SymbolItem("arr", initName, name, false, num);
+                Compiler.pushGlobalItem(item);
+            } else {
+                name = Compiler.getNewTemp();
+                item = new SymbolItem("arr", initName, name, false, num);
+                Compiler.pushItemStack(item);
+            }
+            if (type == 1) { // 初始化了，需要挨个赋值
+                ArrayList<MidCode> midCodesInit = initVal.getMidCode(lastFunc);
+                int index = 0;
+                for (MidCode midCode : midCodesInit) {
+                    if (midCode.getOpType() == null) {
+                        //System.out.println(midCode.getLeft());
+                        ans.add(new MidCode(OpType.ASSIGN, name, midCode.getLeft()));
+                        if (Decl.isGlobal) {
+                            name = Compiler.getNewGlobal();
+                        } else {
+                            name = Compiler.getNewTemp();
+                        }
+                        index++;
+                    } else {
+                        ans.add(midCode);
+                    }
+                }
+                //最后多加了一个 需要减掉
+                if (Decl.isGlobal) {
+                    Compiler.addGlobalNum(-1);
+                } else {
+                    Compiler.addTempNum(-1);
+                }
+                if (index != num) {
+                    System.out.println(index + " " + num);
+                    System.out.println("ERROR!!! VarDef 1维里初始化个数与数组大小不符！");
+                }
+            } else { //未初始化，那就只把空间留出来吧
+                if (Decl.isGlobal) {
+                    Compiler.addGlobalNum(num - 1);
+                } else {
+                    Compiler.addTempNum(num - 1);
+                }
+            }
+            return ans;
         } else if (constExps.size() == 2) {
             //2维
+            int num1 = constExps.get(0).getArrCount();
+            int num2 = constExps.get(1).getArrCount();
+            String name;
+            SymbolItem item;
+            if (Decl.isGlobal) {
+                name = Compiler.getNewGlobal();
+                item = new SymbolItem("arr", initName, name, false, num1, num2);
+                Compiler.pushGlobalItem(item);
+            } else {
+                name = Compiler.getNewTemp();
+                item = new SymbolItem("arr", initName, name, false, num1, num2);
+                Compiler.pushItemStack(item);
+            }
+            if (type == 1) { // 初始化了，需要挨个赋值
+                ArrayList<MidCode> midCodesInit = initVal.getMidCode(lastFunc);
+                int index = 0;
+                for (MidCode midCode : midCodesInit) {
+                    if (midCode.getOpType() == null) {
+                        ans.add(new MidCode(OpType.ASSIGN, name, midCode.getLeft()));
+                        if (Decl.isGlobal) {
+                            name = Compiler.getNewGlobal();
+                        } else {
+                            name = Compiler.getNewTemp();
+                        }
+                        index++;
+                    } else {
+                        ans.add(midCode);
+                    }
+                }
+                //最后多加了一个 需要减掉
+                if (Decl.isGlobal) {
+                    Compiler.addGlobalNum(-1);
+                } else {
+                    Compiler.addTempNum(-1);
+                }
+                if (index != num1 * num2) {
+                    System.out.println("ERROR!!! VarDef 二维里初始化个数与数组大小不符！");
+                }
+            } else { //未初始化，那就只把空间留出来吧
+                if (Decl.isGlobal) {
+                    Compiler.addGlobalNum(num1 * num2 - 1);
+                } else {
+                    Compiler.addTempNum(num1 * num2 - 1);
+                }
+            }
+            return ans;
         }
         return null;
     }

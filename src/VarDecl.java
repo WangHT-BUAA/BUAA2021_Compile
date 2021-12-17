@@ -68,10 +68,10 @@ public class VarDecl {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         for (VarDef varDef : varDefs) {
-            ans.addAll(varDef.getMidCode());
+            ans.addAll(varDef.getMidCode(lastFunc));
         }
         return ans;
     }

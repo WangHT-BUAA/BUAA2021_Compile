@@ -1,12 +1,11 @@
 
+const int e[2][2] = {{1,2},{3,4}};
+
+int func1(){
+    return 1;
+}
 int main(){
-    int a = 0;
-    while (a<6){
-        a = a + 1;
-        if (a < 0){
-            break;
-        }
-    }
-    printf("%d",a);
+    int t = 5;
+    int arr1[e[0][1]] = {func1(),t};
     return 0;
 }

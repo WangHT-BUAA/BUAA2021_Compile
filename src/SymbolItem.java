@@ -7,11 +7,14 @@ public class SymbolItem {
     private String name; //变量名
     private String initName; //原始变量名
     private int dimension; //维度，可以是0
-    private int count; // 如果是0维的话的数值
-    private String index1; //数组的长度，是一个变量名
-    private String index2;
+    private int constNum; //如果是const的话的数值
+    private ArrayList<Integer> constNums = new ArrayList<>(); //如果是const数组的话的数值
+    private int index1; //数组的长度
+    private int index2;
     private ArrayList<String> params = new ArrayList<>(); //函数的参数
     private ArrayList<String> temps = new ArrayList<>(); //函数块里定义的temp
+    private int blockSize = 0;
+
     private int paramNum;
     private ArrayList<SymbolItem> paramItems = new ArrayList<>(); //错误处理 函数的参数们
 
@@ -25,7 +28,7 @@ public class SymbolItem {
 
     }
 
-    public SymbolItem(String type, String initName, String name, boolean isConst, String index1) {
+    public SymbolItem(String type, String initName, String name, boolean isConst, int index1) {
         //1维数组
         this.type = type;
         this.initName = initName;
@@ -36,7 +39,7 @@ public class SymbolItem {
 
     }
 
-    public SymbolItem(String type, String initName, String name, boolean isConst, String index1, String index2) {
+    public SymbolItem(String type, String initName, String name, boolean isConst, int index1, int index2) {
         //2维数组
         this.type = type;
         this.initName = initName;
@@ -117,5 +120,41 @@ public class SymbolItem {
 
     public String getReturnType() {
         return returnType;
+    }
+
+    public int getBlockSize() {
+        return blockSize;
+    }
+
+    public void setBlockSize(int blockSize) {
+        this.blockSize = blockSize;
+    }
+
+    public void setConstNum(int constNum) {
+        this.constNum = constNum;
+    }
+
+    public void setConstNums(ArrayList<Integer> values) {
+        this.constNums = values;
+    }
+
+    public int getConstNum() {
+        return constNum;
+    }
+
+    public int getConstNumAt(int m) {
+        if (m >= index1) {
+            System.out.println("ERROR!取一维const数组的值超出了范围");
+        }
+        //System.out.println(this.initName + " " + constNums.size());
+        return constNums.get(m);
+    }
+
+    public int getConstNumAt(int m, int n) {
+        int index = index1 * m + n;
+        if (index >= index1 * index2) {
+            System.out.println("ERROR!取二维const数组的值超出了范围");
+        }
+        return constNums.get(index);
     }
 }

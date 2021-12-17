@@ -133,49 +133,36 @@ public class UnaryExp {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         if (type == 1) {
-            ans.addAll(primaryExp.getMidCode());
+            ans.addAll(primaryExp.getMidCode(lastFunc));
         } else if (type == 2) {
 
             String initName = ident.getSymbolName(); //函数名
             SymbolItem item = Compiler.getSymbolItem(initName);
             assert item != null;
             //push s
-            ans.add(new MidCode(OpType.PUSH, "ra"));
-            for (String pushName : item.getParams()) {
-                ans.add(new MidCode(OpType.PUSH, pushName));
+            ans.add(new MidCode(OpType.PUSH, "ra", lastFunc));
+            ArrayList<MidCode> partFuncRParams = funcRParams.getMidCode(lastFunc);//各种需要赋值的没用midCode在最后几个
+            int paramNum = item.getParams().size(); //把参数都push进去
+            for (int i = 0; i < partFuncRParams.size() - paramNum; i++) {
+                ans.add(partFuncRParams.get(i));
             }
-            for (String pushName : item.getTemps()) {
-                ans.add(new MidCode(OpType.PUSH, pushName));
+            for (int i = partFuncRParams.size() - paramNum; i < partFuncRParams.size(); i++) {
+                MidCode toPush = partFuncRParams.get(i);
+                int index = (i - (partFuncRParams.size() - paramNum) + 1) * 4;
+                ans.add(new MidCode(OpType.PUSH, toPush.getLeft(), "" + index, lastFunc));
             }
             String name = item.getName();
-            ArrayList<MidCode> partFuncRParams = funcRParams.getMidCode();//各种需要赋值的没用midCode在最后几个
-            ArrayList<String> params = item.getParams();
-            for (int i = 0; i < params.size(); i++) {
-                //把传入的exp赋值给函数的参数
-                MidCode assignMidCode = new MidCode(OpType.ASSIGN,
-                        item.getParams().get(i),
-                        partFuncRParams.get(partFuncRParams.size() - params.size() + i).getLeft());
-                partFuncRParams.set(partFuncRParams.size() - params.size() + i, assignMidCode);
-            }
-            ans.addAll(partFuncRParams);
+            ans.add(new MidCode(OpType.CHANGE_SP, lastFunc, "-")); //更新sp -max
             MidCode callMidCode = new MidCode(OpType.CALL, name); //call
             ans.add(callMidCode);
-            // pop s
-            for (int i = item.getTemps().size() - 1; i >= 0; i--) {
-                ans.add(new MidCode(OpType.POP, item.getTemps().get(i)));
-            }
-            for (int i = item.getParams().size() - 1; i >= 0; i--) {
-                ans.add(new MidCode(OpType.POP, item.getParams().get(i)));
-            }
-            ans.add(new MidCode(OpType.POP, "ra"));
-            String tempName = Compiler.getNewTemp();
-            ans.add(new MidCode(OpType.ASSIGN, tempName, "RET"));
-            ans.add(new MidCode(tempName));
+            ans.add(new MidCode(OpType.CHANGE_SP, lastFunc, "+")); //更新sp +max
+            ans.add(new MidCode(OpType.POP, "ra", lastFunc));
+            ans.add(new MidCode("RET"));
         } else if (type == 3) {
-            ArrayList<MidCode> part = unaryExp.getMidCode();
+            ArrayList<MidCode> part = unaryExp.getMidCode(lastFunc);
             MidCode midCodePart = part.get(part.size() - 1);
             part.remove(part.size() - 1);
             ans.addAll(part); //把去掉最后一项的midCode们加入ans
@@ -196,5 +183,29 @@ public class UnaryExp {
             }
         }
         return ans;
+    }
+
+    public int getArrCount() {
+        //UnaryExp → PrimaryExp | Ident '(' [FuncRParams] ')' | UnaryOp UnaryExp
+        if (type == 1) {
+            return primaryExp.getArrCount();
+        } else if (type == 2) {
+            System.out.println("UnaryExp:getArrCountError!!!!");
+            return 0;
+        } else if (type == 3) {
+            String op = unaryOp.getOp();
+            if (op.equals("PLUS")) {
+                return unaryExp.getArrCount();
+            } else if (op.equals("MINU")) {
+                return -1 * unaryExp.getArrCount();
+            } else if (op.equals("NOT")) {
+                if (unaryExp.getArrCount() == 0) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+        return 0;
     }
 }

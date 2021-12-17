@@ -56,24 +56,15 @@ public class LOrExp {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc, String endLabel, String beginLabel) {
         ArrayList<MidCode> ans = new ArrayList<>();
-        ans.addAll(lAndExps.get(0).getMidCode());
-        if (lAndExps.size() == 1) {
-            return ans;
-        }
-        for (int i = 1; i < lAndExps.size(); i++) {
-            ArrayList<MidCode> part = lAndExps.get(i).getMidCode();
-            MidCode midCodeAns = ans.get(ans.size() - 1);
-            MidCode midCodePart = part.get(part.size() - 1);
-            ans.remove(ans.size() - 1);
-            part.remove(part.size() - 1);
+        for (int i = 0; i < lAndExps.size(); i++) {
+            String nextLabel = Compiler.getNewLabel();
+            ArrayList<MidCode> part = lAndExps.get(i).getMidCode(lastFunc, nextLabel, beginLabel);
             ans.addAll(part);
-            String newTemp = Compiler.getNewTemp();
-            MidCode orMidCode = new MidCode(OpType.OR, newTemp, midCodeAns.getLeft(), midCodePart.getLeft());
-            ans.add(orMidCode);
-            ans.add(new MidCode(newTemp));
+            ans.add(new MidCode(OpType.LABEL, nextLabel));
         }
+        ans.add(new MidCode(OpType.JUMP, endLabel));
         return ans;
     }
 }

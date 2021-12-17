@@ -26,7 +26,7 @@ public class Cond {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
-        return lOrExp.getMidCode();
+    public ArrayList<MidCode> getMidCode(String lastFunc, String endLabel, String beginLabel) {
+        return lOrExp.getMidCode(lastFunc, endLabel, beginLabel);
     }
 }

@@ -77,13 +77,25 @@ public class ConstInitVal {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    //useless//
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         if (type == 1) {
-            ans.addAll(constExp.getMidCode());
-        } else if (type == 2) {
-            //todo
+            ans.addAll(constExp.getMidCode(lastFunc));
         }
         return ans;
+    }
+
+    public ArrayList<Integer> getArrCounts() {
+        ArrayList<Integer> ans = new ArrayList<>();
+        if (type == 1) {
+            ans.add(constExp.getArrCount());
+            return ans;
+        } else {
+            for (ConstInitVal constInitVal : constInitVals) {
+                ans.addAll(constInitVal.getArrCounts());
+            }
+            return ans;
+        }
     }
 }

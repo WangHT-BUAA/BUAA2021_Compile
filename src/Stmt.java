@@ -382,11 +382,11 @@ public class Stmt {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode(String whileLabel) {
+    public ArrayList<MidCode> getMidCode(String whileLabel, String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         if (type == 1) {
-            ArrayList<MidCode> partLVal = lValEq.getMidCode();
-            ArrayList<MidCode> partExp = expEq.getMidCode();
+            ArrayList<MidCode> partLVal = lValEq.getMidCode(lastFunc);
+            ArrayList<MidCode> partExp = expEq.getMidCode(lastFunc);
             MidCode midCodeLVal = partLVal.get(partLVal.size() - 1);
             MidCode midCodeExp = partExp.get(partExp.size() - 1);
             partExp.remove(partExp.size() - 1);
@@ -397,7 +397,10 @@ public class Stmt {
             ans.add(assignMidCode);
             return ans;
         } else if (type == 2) {
-            ArrayList<MidCode> partExp = expAlone.getMidCode();
+            if (!expAlone.isSuccess()) {
+                return ans;
+            }
+            ArrayList<MidCode> partExp = expAlone.getMidCode(lastFunc);
             if (partExp.get(partExp.size() - 1).getOpType() == null) {
                 partExp.remove(partExp.size() - 1);
             }
@@ -405,30 +408,31 @@ public class Stmt {
             return ans;
         } else if (type == 3) {
             int index = Compiler.symbolTable.size();
-            ArrayList<MidCode> midCodes = block.getMidCode(whileLabel);
+            ArrayList<MidCode> midCodes = block.getMidCode(whileLabel, lastFunc);
             Compiler.popSymbolTable(index);//维护符号表，pop掉block里的变量直到恢复到入块之前的大小
             return midCodes;
         } else if (type == 4) {
             //'if' '( Cond ')' Stmt [ 'else' Stmt ]
             String startName = Compiler.getNewIf(); //if1
             String endName = startName + "_end";
+            String beginLabel = startName + "_begin";
             MidCode startLabel = new MidCode(OpType.LABEL, startName);
             ans.add(startLabel);
-            ArrayList<MidCode> condMidCodes = condIf.getMidCode();
-            MidCode midCodeCond = condMidCodes.get(condMidCodes.size() - 1);
-            condMidCodes.remove(condMidCodes.size() - 1);
-            MidCode beqMidCode = new MidCode(OpType.BEQ, midCodeCond.getLeft(), "$0", endName);
+            ArrayList<MidCode> condMidCodes = condIf.getMidCode(lastFunc, endName, beginLabel);
+            //MidCode midCodeCond = condMidCodes.get(condMidCodes.size() - 1);
+            //condMidCodes.remove(condMidCodes.size() - 1);
+            //MidCode beqMidCode = new MidCode(OpType.BEQ, midCodeCond.getLeft(), "$0", endName);
             ans.addAll(condMidCodes);
-            ans.add(beqMidCode);
-
-            ans.addAll(stmtIf.getMidCode(whileLabel));
+            //ans.add(beqMidCode);
+            ans.add(new MidCode(OpType.LABEL, beginLabel));
+            ans.addAll(stmtIf.getMidCode(whileLabel, lastFunc));
             if (flag == 0) {
                 ans.add(new MidCode(OpType.LABEL, endName));
             } else {
                 String elseName = startName + "_else_end";
                 ans.add(new MidCode(OpType.JUMP, elseName));
                 ans.add(new MidCode(OpType.LABEL, endName));
-                ans.addAll(stmtElse.getMidCode(whileLabel));
+                ans.addAll(stmtElse.getMidCode(whileLabel, lastFunc));
                 ans.add(new MidCode(OpType.LABEL, elseName));
             }
             return ans;
@@ -437,13 +441,15 @@ public class Stmt {
             //'while' '(' Cond ')' Stmt
             String startName = Compiler.getNewWhile();
             String endName = startName + "_end";
+            String beginLabel = startName + "_begin";
             ans.add(new MidCode(OpType.LABEL, startName));
-            ArrayList<MidCode> condMidCodes = condWhile.getMidCode();
-            MidCode midCodeCond = condMidCodes.get(condMidCodes.size() - 1);
-            condMidCodes.remove(condMidCodes.size() - 1);
+            ArrayList<MidCode> condMidCodes = condWhile.getMidCode(lastFunc, endName, beginLabel);
+            //MidCode midCodeCond = condMidCodes.get(condMidCodes.size() - 1);
+            //condMidCodes.remove(condMidCodes.size() - 1);
             ans.addAll(condMidCodes);
-            ans.add(new MidCode(OpType.BEQ, midCodeCond.getLeft(), "$0", endName));
-            ans.addAll(stmtWhile.getMidCode(startName));
+            //ans.add(new MidCode(OpType.BEQ, midCodeCond.getLeft(), "$0", endName));
+            ans.add(new MidCode(OpType.LABEL, beginLabel));
+            ans.addAll(stmtWhile.getMidCode(startName, lastFunc));
             ans.add(new MidCode(OpType.JUMP, startName));
             ans.add(new MidCode(OpType.LABEL, endName));
             return ans;
@@ -460,7 +466,7 @@ public class Stmt {
             return ans;
         } else if (type == 7) {
             if (expReturn.isSuccess()) {
-                ArrayList<MidCode> partExp = expReturn.getMidCode();
+                ArrayList<MidCode> partExp = expReturn.getMidCode(lastFunc);
                 MidCode midCodeExp = partExp.get(partExp.size() - 1);
                 partExp.remove(partExp.size() - 1);
                 MidCode returnMidCode = new MidCode(OpType.RETURN, midCodeExp.getLeft());
@@ -468,11 +474,12 @@ public class Stmt {
                 ans.add(returnMidCode);
                 return ans;
             } else {
+                ans.add(new MidCode(OpType.RETURN, "NULL"));
                 return ans;
             }
         } else if (type == 8) {
             //getint
-            ArrayList<MidCode> partLVal = lValGetInt.getMidCode();
+            ArrayList<MidCode> partLVal = lValGetInt.getMidCode(lastFunc);
             MidCode midCodeLVal = partLVal.get(partLVal.size() - 1);
             partLVal.remove(partLVal.size() - 1);
             ans.addAll(partLVal);
@@ -488,7 +495,7 @@ public class Stmt {
             int i = 0;
             for (String s : arr) {
                 if (s.equals("%d")) {
-                    ArrayList<MidCode> part = expsPrint.get(i++).getMidCode();
+                    ArrayList<MidCode> part = expsPrint.get(i++).getMidCode(lastFunc);
                     MidCode midCode = part.get(part.size() - 1);
                     part.remove(part.size() - 1);
                     ans.addAll(part);

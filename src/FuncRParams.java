@@ -58,11 +58,11 @@ public class FuncRParams {
         return ans.toString();
     }
 
-    public ArrayList<MidCode> getMidCode() {
+    public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
         ArrayList<MidCode> toParaMidCode = new ArrayList<>();
         for (Exp exp : exps) {
-            ArrayList<MidCode> part = exp.getMidCode();
+            ArrayList<MidCode> part = exp.getMidCode(lastFunc);
             MidCode midCode = part.get(part.size() - 1);
             part.remove(part.size() - 1);
             ans.addAll(part);

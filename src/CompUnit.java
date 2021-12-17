@@ -61,9 +61,11 @@ public class CompUnit {
     public ArrayList<MidCode> getMidCode() {
         ArrayList<MidCode> ans = new ArrayList<>();
         ArrayList<MidCode> funcPart = new ArrayList<>();
+        Decl.isGlobal = true;
         for (Decl decl : decls) {
-            ans.addAll(decl.getMidCode());
+            ans.addAll(decl.getMidCode(null));
         }
+        Decl.isGlobal = false;
         for (FuncDef funcDef : funcDefs) {
             funcPart.addAll(funcDef.getMidCode());
         }

@@ -7,6 +7,7 @@ public class MidCode {
     private boolean isConst = false;
     private String offset = null;
     private int arrType = 0;
+    private Integer value = null; //常数的值
 
     public MidCode(OpType opType, String left, String right1, String right2) {
         //加减乘除等
@@ -36,6 +37,10 @@ public class MidCode {
             //输出 可以是int，也可以是str，也可以是number
             //这存的就是left的类型
             this.right1 = str;
+        } else if (opType == OpType.CHANGE_SP) {
+            this.right1 = str;
+        } else {
+            this.right1 = str;
         }
 
     }
@@ -44,6 +49,14 @@ public class MidCode {
         //label标签 return语句 getint语句 函数调用
         this.opType = opType;
         this.left = left;
+    }
+
+    public MidCode(OpType opType, String left, int value) {
+        //常数赋值
+        this.opType = opType;
+        this.left = left;
+        this.value = value;
+        this.right1 = null;
     }
 
     public MidCode(OpType opType, String left, boolean isConst) {
@@ -75,6 +88,10 @@ public class MidCode {
         return opType;
     }
 
+    public int getValue() {
+        return value;
+    }
+
     public String toString() {
         String ans = "";
         if (this.opType != null) {
@@ -90,6 +107,9 @@ public class MidCode {
         }
         if (this.right2 != null) {
             ans += " " + this.right2;
+        }
+        if (this.value != null) {
+            ans += " " + this.value;
         }
         return ans;
     }
@@ -116,6 +136,7 @@ enum OpType {
     SW, //赋值语句左侧有数组 存入内存中
     PUSH, //压栈
     POP, //出栈
+    CHANGE_SP, //调整sp的位置
     CALL, //函数调用
     GETINT,//读入一个整数
     PRINT,//输出
@@ -128,8 +149,7 @@ enum OpType {
     GEQ, // >=
     EQL, // ==
     NEQ, // !=
-    AND, // &&
-    OR, // ||
     BEQ, // 通常用来和0比较 cond结果为0(假)就直接跳走了 beq temp1，$0,label
+    BNE, // 同上
     JUMP, //直接跳到某个标签
 }
