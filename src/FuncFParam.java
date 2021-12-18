@@ -96,16 +96,25 @@ public class FuncFParam {
         ArrayList<MidCode> ans = new ArrayList<>();
         String type = bType.getType(); //must be int
         String initName = ident.getSymbolName();
-        String name = Compiler.getNewTemp();
         if (dimension == 0) {
+            String name = Compiler.getNewTempOrGlobal();
             SymbolItem paraItem = new SymbolItem("var", initName, name, false);
             Compiler.pushItemStack(paraItem);
             MidCode paraMidCode = new MidCode(OpType.PARA, name);
             ans.add(paraMidCode);
         } else if (dimension == 1) {
             //一维数组
+            String name = Compiler.getNewPtr();
+            SymbolItem paraItem = new SymbolItem("arr", initName, name, false, 999);
+            Compiler.pushItemStack(paraItem);
+            ans.add(new MidCode(OpType.PARA, name));
         } else if (dimension == 2) {
             //二维数组
+            String name = Compiler.getNewPtr();
+            int index2 = constExps.get(0).getArrCount();
+            SymbolItem paraItem = new SymbolItem("arr", initName, name, false, 999, index2);
+            Compiler.pushItemStack(paraItem);
+            ans.add(new MidCode(OpType.PARA, name));
         }
         return ans;
     }

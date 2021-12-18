@@ -26,6 +26,7 @@ public class MipsGenerator {
 
     private void addTextSection(ArrayList<MidCode> midCodes) {
         mipsCodes.add(new MipsCode(".text"));
+        mipsCodes.add(new MipsCode(MipsOp.add, "$gp", "$gp", "0x38000"));
         for (MidCode midCode : midCodes) {
             OpType midOp = midCode.getOpType();
             switch (midOp) {
@@ -318,16 +319,65 @@ public class MipsGenerator {
 
     private void dealPUSHMidCode(MidCode midCode) {
         String left = midCode.getLeft();
+        String regEx = "[^0-9]";
+        Pattern p = Pattern.compile(regEx);
         if (left.equals("ra")) {
             String lastFunc = midCode.getRight1();
             int maxSize = Compiler.getFuncMax(lastFunc) * 4;
             String toCount = "" + maxSize;
             mipsCodes.add(new MipsCode(MipsOp.sw, "$ra", "-" + toCount + "($sp)"));
-        } else {
-            String index = midCode.getRight1();
-            String lastFunc = midCode.getRight2();
-            int maxSize = Compiler.getFuncMax(lastFunc) * 4 + Integer.parseInt(index);
-            String toCount = "" + maxSize;
+            return;
+        }
+        String index = midCode.getRight1();
+        String lastFunc = midCode.getRight2();
+        int maxSize = Compiler.getFuncMax(lastFunc) * 4 + Integer.parseInt(index);
+        String toCount = "" + maxSize;
+        if (left.charAt(left.length() - 1) == 'r') {
+            //是个arr
+            String[] split = left.split("_");
+            if (split.length == 2) {
+                //getVarToReg(split[0], "$t0");
+                Matcher m = p.matcher(split[0]);
+                int num = Integer.parseInt(m.replaceAll("").trim()) * 4;
+                if (split[0].charAt(0) == 'p') {
+                    mipsCodes.add(new MipsCode(MipsOp.lw, "$t0", "-" + num + "($sp)"));
+                    mipsCodes.add(new MipsCode(MipsOp.sw, "$t0", "-" + toCount + "($sp)"));
+                } else if (split[0].charAt(0) == 't') {
+                    mipsCodes.add(new MipsCode(MipsOp.add, "$t0", "$sp", "-" + num));
+                    mipsCodes.add(new MipsCode(MipsOp.sw, "$t0", "-" + toCount + "($sp)"));
+                } else if (split[0].charAt(0) == 'g') {
+                    mipsCodes.add(new MipsCode(MipsOp.add, "$t0", "$gp", "-" + num));
+                    mipsCodes.add(new MipsCode(MipsOp.sw, "$t0", "-" + toCount + "($sp)"));
+                }
+            } else if (split.length == 3) {
+                Matcher m1 = p.matcher(split[0]);
+                Matcher m2 = p.matcher(split[1]);
+                int num1 = Integer.parseInt(m1.replaceAll("").trim()) * 4;
+                int num2 = Integer.parseInt(m2.replaceAll("").trim()) * 4;
+                if (split[0].charAt(0) == 'p') {
+                    mipsCodes.add(new MipsCode(MipsOp.lw, "$t1", "-" + num1 + "($sp)")); //ptr里的值
+                    getVarToReg(split[1], "$t0");
+                    mipsCodes.add(new MipsCode(MipsOp.sll, "$t0", "$t0", "2"));
+                    mipsCodes.add(new MipsCode(MipsOp.sub, "$t0", "$t1", "$t0"));
+                    mipsCodes.add(new MipsCode(MipsOp.sw, "$t0", "-" + toCount + "($sp)"));
+                } else if (split[0].charAt(0) == 't') {
+                    getVarToReg(split[1], "$t0");
+                    mipsCodes.add(new MipsCode(MipsOp.sll, "$t0", "$t0", "2"));
+                    mipsCodes.add(new MipsCode(MipsOp.add, "$t0", "$t0", "" + num1));
+                    mipsCodes.add(new MipsCode(MipsOp.sub, "$t0", "$sp", "$t0"));
+                    mipsCodes.add(new MipsCode(MipsOp.sw, "$t0", "-" + toCount + "($sp)"));
+                } else if (split[0].charAt(0) == 'g') {
+                    getVarToReg(split[1], "$t0");
+                    mipsCodes.add(new MipsCode(MipsOp.sll, "$t0", "$t0", "2"));
+                    mipsCodes.add(new MipsCode(MipsOp.add, "$t0", "$t0", "" + num1));
+                    mipsCodes.add(new MipsCode(MipsOp.sub, "$t0", "$gp", "$t0"));
+                    mipsCodes.add(new MipsCode(MipsOp.sw, "$t0", "-" + toCount + "($sp)"));
+                }
+
+            } else {
+                System.out.println("ERROR!!!夭寿啦！为什么push能有4个元素的？");
+            }
+        } else { //正常的数字被push
             getVarToReg(left, "$t0");
             mipsCodes.add(new MipsCode(MipsOp.sw, "$t0", "-" + toCount + "($sp)"));
         }
@@ -461,10 +511,56 @@ public class MipsGenerator {
     private void getVarToReg(String var, String reg) {
         String regEx = "[^0-9]";
         Pattern p = Pattern.compile(regEx);
+
+        String[] splits = var.split("_");
+        if (splits.length > 1) {
+            String s1 = splits[1];
+            getVarToRegSingle(s1, "$t3");
+            mipsCodes.add(new MipsCode(MipsOp.sll, "$t3", "$t3", "2"));
+            String s0 = splits[0];
+            Matcher m = p.matcher(s0);
+            int num = Integer.parseInt(m.replaceAll("").trim()) * 4;
+            if (s0.charAt(0) == 't') {
+                mipsCodes.add(new MipsCode(MipsOp.addi, "$t3", "$t3", "" + num));
+                mipsCodes.add(new MipsCode(MipsOp.sub, "$t3", "$sp", "$t3"));
+                mipsCodes.add(new MipsCode(MipsOp.lw, reg, "($t3)"));
+            } else if (s0.charAt(0) == 'g') {
+                mipsCodes.add(new MipsCode(MipsOp.addi, "$t3", "$t3", "" + num));
+                mipsCodes.add(new MipsCode(MipsOp.sub, "$t3", "$gp", "$t3"));
+                mipsCodes.add(new MipsCode(MipsOp.lw, reg, "($t3)"));
+            } else if (s0.charAt(0) == 'p') {
+                mipsCodes.add(new MipsCode(MipsOp.lw, "$t4", "-" + num + "($sp)"));
+                //todo 这里先默认是 -
+                mipsCodes.add(new MipsCode(MipsOp.sub, "$t3", "$t4", "$t3"));
+                mipsCodes.add(new MipsCode(MipsOp.lw, reg, "($t3)"));
+            } else {
+                System.out.println("ERROR!!! getVarToReg");
+            }
+        } else {
+            if (var.equals("RET")) {
+                mipsCodes.add(new MipsCode(MipsOp.add, reg, "$0", "$v0"));
+                return;
+            }
+            Matcher m = p.matcher(var);
+            int num = Integer.parseInt(m.replaceAll("").trim()) * 4;
+            if (var.charAt(0) == 'g') {
+                mipsCodes.add(new MipsCode(MipsOp.lw, reg, "-" + num + "($gp)"));
+            } else if (var.charAt(0) == 't') {
+                mipsCodes.add(new MipsCode(MipsOp.lw, reg, "-" + num + "($sp)"));
+            } else if (var.charAt(0) == 'p') {
+                mipsCodes.add(new MipsCode(MipsOp.lw, "$t4", "-" + num + "($sp)"));
+                mipsCodes.add(new MipsCode(MipsOp.lw, reg, "($t4)"));
+            }
+        }
+    }
+
+    private void getVarToRegSingle(String var, String reg) {
+        String regEx = "[^0-9]";
+        Pattern p = Pattern.compile(regEx);
         Matcher m = p.matcher(var);
         int num = Integer.parseInt(m.replaceAll("").trim()) * 4;
         if (var.charAt(0) == 'g') {
-            mipsCodes.add(new MipsCode(MipsOp.lw, reg, num + "($gp)"));
+            mipsCodes.add(new MipsCode(MipsOp.lw, reg, "-" + num + "($gp)"));
         } else if (var.charAt(0) == 't') {
             mipsCodes.add(new MipsCode(MipsOp.lw, reg, "-" + num + "($sp)"));
         }
@@ -473,10 +569,48 @@ public class MipsGenerator {
     private void putRegToVar(String reg, String var) {
         String regEx = "[^0-9]";
         Pattern p = Pattern.compile(regEx);
+        String[] splits = var.split("_");
+        if (splits.length > 1) {
+            String s1 = splits[1];
+            getVarToRegSingle(s1, "$t3");
+            mipsCodes.add(new MipsCode(MipsOp.sll, "$t3", "$t3", "2"));
+            String s0 = splits[0];
+            Matcher m = p.matcher(s0);
+            int num = Integer.parseInt(m.replaceAll("").trim()) * 4;
+            if (s0.charAt(0) == 't') {
+                mipsCodes.add(new MipsCode(MipsOp.addi, "$t3", "$t3", "" + num));
+                mipsCodes.add(new MipsCode(MipsOp.sub, "$t3", "$sp", "$t3"));
+                mipsCodes.add(new MipsCode(MipsOp.sw, reg, "($t3)"));
+            } else if (s0.charAt(0) == 'g') {
+                mipsCodes.add(new MipsCode(MipsOp.addi, "$t3", "$t3", "" + num));
+                mipsCodes.add(new MipsCode(MipsOp.sub, "$t3", "$gp", "$t3"));
+                mipsCodes.add(new MipsCode(MipsOp.sw, reg, "($t3)"));
+            } else if (s0.charAt(0) == 'p') {
+                mipsCodes.add(new MipsCode(MipsOp.lw, "$t4", "-" + num + "($sp)"));
+                //todo 这里先默认是 -
+                mipsCodes.add(new MipsCode(MipsOp.sub, "$t3", "$t4", "$t3"));
+                mipsCodes.add(new MipsCode(MipsOp.sw, reg, "($t3)"));
+            } else {
+                System.out.println("ERROR!!! getVarToReg");
+            }
+        } else {
+            Matcher m = p.matcher(var);
+            int num = Integer.parseInt(m.replaceAll("").trim()) * 4;
+            if (var.charAt(0) == 'g') {
+                mipsCodes.add(new MipsCode(MipsOp.sw, reg, "-" + num + "($gp)"));
+            } else if (var.charAt(0) == 't') {
+                mipsCodes.add(new MipsCode(MipsOp.sw, reg, "-" + num + "($sp)"));
+            }
+        }
+    }
+
+    private void putRegToVarSingle(String reg, String var) {
+        String regEx = "[^0-9]";
+        Pattern p = Pattern.compile(regEx);
         Matcher m = p.matcher(var);
         int num = Integer.parseInt(m.replaceAll("").trim()) * 4;
         if (var.charAt(0) == 'g') {
-            mipsCodes.add(new MipsCode(MipsOp.sw, reg, num + "($gp)"));
+            mipsCodes.add(new MipsCode(MipsOp.sw, reg, "-" + num + "($gp)"));
         } else if (var.charAt(0) == 't') {
             mipsCodes.add(new MipsCode(MipsOp.sw, reg, "-" + num + "($sp)"));
         }
@@ -562,5 +696,5 @@ enum MipsOp {
     sne, // !=
     sltiu,
     xori, //抑或立即数
-
+    sll, //左移
 }

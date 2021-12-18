@@ -124,11 +124,7 @@ public class ConstDef {
                     int value = values.get(i);
                     ans.add(new MidCode(OpType.ASSIGN, newName, value));
                     if (i < values.size() - 1) {
-                        if (Decl.isGlobal) {
-                            newName = Compiler.getNewGlobal();
-                        } else {
-                            newName = Compiler.getNewTemp();
-                        }
+                        newName = Compiler.getNewTempOrGlobal();
                     }
                 }
                 break;

@@ -35,7 +35,7 @@ public class Number {
 
     public ArrayList<MidCode> getMidCode() {
         ArrayList<MidCode> ans = new ArrayList<>();
-        String newTemp = Compiler.getNewTemp();
+        String newTemp = Compiler.getNewTempOrGlobal();
         MidCode immMidCode = new MidCode(OpType.IMM, newTemp, number);
         ans.add(immMidCode);
         ans.add(new MidCode(newTemp));

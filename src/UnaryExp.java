@@ -150,6 +150,7 @@ public class UnaryExp {
                 ans.add(partFuncRParams.get(i));
             }
             for (int i = partFuncRParams.size() - paramNum; i < partFuncRParams.size(); i++) {
+                //todo
                 MidCode toPush = partFuncRParams.get(i);
                 int index = (i - (partFuncRParams.size() - paramNum) + 1) * 4;
                 ans.add(new MidCode(OpType.PUSH, toPush.getLeft(), "" + index, lastFunc));
@@ -160,14 +161,16 @@ public class UnaryExp {
             ans.add(callMidCode);
             ans.add(new MidCode(OpType.CHANGE_SP, lastFunc, "+")); //更新sp +max
             ans.add(new MidCode(OpType.POP, "ra", lastFunc));
-            ans.add(new MidCode("RET"));
+            String newName = Compiler.getNewTempOrGlobal();
+            ans.add(new MidCode(OpType.ASSIGN, newName, "RET"));
+            ans.add(new MidCode(newName));
         } else if (type == 3) {
             ArrayList<MidCode> part = unaryExp.getMidCode(lastFunc);
             MidCode midCodePart = part.get(part.size() - 1);
             part.remove(part.size() - 1);
             ans.addAll(part); //把去掉最后一项的midCode们加入ans
             String op = unaryOp.getOp();
-            String newTemp = Compiler.getNewTemp();
+            String newTemp = Compiler.getNewTempOrGlobal();
             if (op.equals("PLUS")) {
                 MidCode singleMidCode = new MidCode(OpType.ADD_SINGLE, newTemp, midCodePart.getLeft());
                 ans.add(singleMidCode);

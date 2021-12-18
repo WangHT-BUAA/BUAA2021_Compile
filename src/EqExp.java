@@ -73,7 +73,7 @@ public class EqExp {
             part.remove(part.size() - 1);
             ans.addAll(part);
             String character = characters.get(i - 1);
-            String newTemp = Compiler.getNewTemp();
+            String newTemp = Compiler.getNewTempOrGlobal();
             if (character.equals("EQL")) {
                 MidCode eqlMidCode = new MidCode(OpType.EQL, newTemp, midCodeAns.getLeft(), midCodePart.getLeft());
                 ans.add(eqlMidCode);

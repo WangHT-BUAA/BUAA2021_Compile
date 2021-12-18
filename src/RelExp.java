@@ -75,7 +75,7 @@ public class RelExp {
             part.remove(part.size() - 1);
             ans.addAll(part);
             String character = characters.get(i - 1);
-            String newTemp = Compiler.getNewTemp();
+            String newTemp = Compiler.getNewTempOrGlobal();
             if (character.equals("LSS")) {
                 // <
                 MidCode lssMidCode = new MidCode(OpType.LSS, newTemp, midCodeAns.getLeft(), midCodePart.getLeft());

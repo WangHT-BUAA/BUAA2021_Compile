@@ -77,6 +77,10 @@ public class VarDef {
 
     public ArrayList<MidCode> getMidCode(String lastFunc) {
         ArrayList<MidCode> ans = new ArrayList<>();
+        ArrayList<MidCode> midCodesInit = null;
+        if (type == 1) {
+            midCodesInit = initVal.getMidCode(lastFunc);
+        }
         if (constExps.size() == 0) {
             //0维
             String name;
@@ -93,11 +97,10 @@ public class VarDef {
             MidCode defMidCode = new MidCode(OpType.VAR, name, false);// 定义
             ans.add(defMidCode);
             if (type == 1) {
-                ArrayList<MidCode> partInitVal = initVal.getMidCode(lastFunc);
-                MidCode midCodeInitVal = partInitVal.get(partInitVal.size() - 1);
-                partInitVal.remove(partInitVal.size() - 1);
+                MidCode midCodeInitVal = midCodesInit.get(midCodesInit.size() - 1);
+                midCodesInit.remove(midCodesInit.size() - 1);
                 MidCode assignMidCode = new MidCode(OpType.ASSIGN, name, midCodeInitVal.getLeft());
-                ans.addAll(partInitVal);
+                ans.addAll(midCodesInit);
                 ans.add(assignMidCode);
             }
             return ans;
@@ -116,17 +119,12 @@ public class VarDef {
                 Compiler.pushItemStack(item);
             }
             if (type == 1) { // 初始化了，需要挨个赋值
-                ArrayList<MidCode> midCodesInit = initVal.getMidCode(lastFunc);
                 int index = 0;
                 for (MidCode midCode : midCodesInit) {
                     if (midCode.getOpType() == null) {
                         //System.out.println(midCode.getLeft());
                         ans.add(new MidCode(OpType.ASSIGN, name, midCode.getLeft()));
-                        if (Decl.isGlobal) {
-                            name = Compiler.getNewGlobal();
-                        } else {
-                            name = Compiler.getNewTemp();
-                        }
+                        name = Compiler.getNewTempOrGlobal();
                         index++;
                     } else {
                         ans.add(midCode);
@@ -166,16 +164,11 @@ public class VarDef {
                 Compiler.pushItemStack(item);
             }
             if (type == 1) { // 初始化了，需要挨个赋值
-                ArrayList<MidCode> midCodesInit = initVal.getMidCode(lastFunc);
                 int index = 0;
                 for (MidCode midCode : midCodesInit) {
                     if (midCode.getOpType() == null) {
                         ans.add(new MidCode(OpType.ASSIGN, name, midCode.getLeft()));
-                        if (Decl.isGlobal) {
-                            name = Compiler.getNewGlobal();
-                        } else {
-                            name = Compiler.getNewTemp();
-                        }
+                        name = Compiler.getNewTempOrGlobal();
                         index++;
                     } else {
                         ans.add(midCode);

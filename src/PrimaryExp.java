@@ -83,7 +83,7 @@ public class PrimaryExp {
         if (type == 1) {
             ans.addAll(exp.getMidCode(lastFunc));
         } else if (type == 2) {
-            ans.addAll(lVal.getMidCode());
+            ans.addAll(lVal.getMidCode(lastFunc));
         } else if (type == 3) {
             ans.addAll(number.getMidCode());
         }

@@ -8,6 +8,7 @@ public class MidCode {
     private String offset = null;
     private int arrType = 0;
     private Integer value = null; //常数的值
+    private boolean isArr = false;
 
     public MidCode(OpType opType, String left, String right1, String right2) {
         //加减乘除等
@@ -70,6 +71,21 @@ public class MidCode {
         //中间代码ArrayList里最后的那个存数的
         //统一存到left里
         this.left = left;
+    }
+
+    public void setArr(boolean arr) {
+        isArr = arr;
+    }
+
+    public boolean isArr() {
+        return isArr;
+    }
+
+    public MidCode(String left, String right1) {
+        //这也是个存数的
+        //left是基地址的名字，right1是偏移
+        this.left = left;
+        this.right1 = right1;
     }
 
     public String getLeft() {

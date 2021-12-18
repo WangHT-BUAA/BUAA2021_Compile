@@ -1,22 +1,102 @@
-ASSIGN global0 1
-ASSIGN global1 2
-ASSIGN global2 3
-ASSIGN global3 4
+str0 : 
+str1 : \n
+IMM global0 1
+ASSIGN global10 global0
+IMM global1 0
+ASSIGN global11 global1
+IMM global2 0
+ASSIGN global12 global2
+IMM global3 1
+SUB_SINGLE global4 global3
+ASSIGN global13 global4
+IMM global5 1
+SUB_SINGLE global6 global5
+ASSIGN global14 global6
+IMM global7 0
+ASSIGN global15 global7
+IMM global8 0
+ASSIGN global16 global8
+IMM global9 1
+ASSIGN global17 global9
 LABEL Main
-VAR temp0
-IMM temp1 5
-ASSIGN temp0 temp1
 PUSH ra main
+PUSH global10_arr 4 main
 CHANGE_SP main -
-CALL func0
+CALL func1
 CHANGE_SP main +
 POP ra main
-ASSIGN temp2 RET
-ASSIGN temp3 temp0
-IMM temp4 0
+ASSIGN temp0 RET
+IMM temp1 0
 LABEL MainEnd
-RETURN temp4
+RETURN temp1
 FUNC func0
-IMM temp0 1
-RETURN temp0
+PARA ptr0
+VAR temp2
+IMM temp1 0
+ASSIGN temp2 temp1
+LABEL while0
+IMM temp3 2
+LSS temp4 temp2 temp3
+BEQ temp4 $0 label0
+JUMP while0_begin
+LABEL label0
+JUMP while0_end
+LABEL while0_begin
+PRINT str0 str
+ASSIGN temp5 temp2
+PRINT ptr0_temp5 int
+IMM temp6 1
+ADD temp7 temp2 temp6
+ASSIGN temp2 temp7
+JUMP while0
+LABEL while0_end
+PRINT str1 str
 FUNC_END func0
+FUNC func1
+PARA ptr0
+PUSH ra func1
+IMM temp1 0
+ASSIGN temp2 temp1
+ASSIGN temp3 2
+MUL temp2 temp2 temp3
+PUSH ptr0_temp2_arr 4 func1
+CHANGE_SP func1 -
+CALL func0
+CHANGE_SP func1 +
+POP ra func1
+ASSIGN temp4 RET
+PUSH ra func1
+IMM temp5 1
+ASSIGN temp6 temp5
+ASSIGN temp7 2
+MUL temp6 temp6 temp7
+PUSH ptr0_temp6_arr 4 func1
+CHANGE_SP func1 -
+CALL func0
+CHANGE_SP func1 +
+POP ra func1
+ASSIGN temp8 RET
+PUSH ra func1
+IMM temp9 2
+ASSIGN temp10 temp9
+ASSIGN temp11 2
+MUL temp10 temp10 temp11
+PUSH ptr0_temp10_arr 4 func1
+CHANGE_SP func1 -
+CALL func0
+CHANGE_SP func1 +
+POP ra func1
+ASSIGN temp12 RET
+PUSH ra func1
+IMM temp13 3
+ASSIGN temp14 temp13
+ASSIGN temp15 2
+MUL temp14 temp14 temp15
+PUSH ptr0_temp14_arr 4 func1
+CHANGE_SP func1 -
+CALL func0
+CHANGE_SP func1 +
+POP ra func1
+ASSIGN temp16 RET
+RETURN NULL
+FUNC_END func1

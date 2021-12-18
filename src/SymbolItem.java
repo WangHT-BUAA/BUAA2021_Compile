@@ -9,8 +9,8 @@ public class SymbolItem {
     private int dimension; //维度，可以是0
     private int constNum; //如果是const的话的数值
     private ArrayList<Integer> constNums = new ArrayList<>(); //如果是const数组的话的数值
-    private int index1; //数组的长度
-    private int index2;
+    private Integer index1 = null; //数组的长度
+    private Integer index2 = null;
     private ArrayList<String> params = new ArrayList<>(); //函数的参数
     private ArrayList<String> temps = new ArrayList<>(); //函数块里定义的temp
     private int blockSize = 0;
@@ -140,6 +140,14 @@ public class SymbolItem {
 
     public int getConstNum() {
         return constNum;
+    }
+
+    public Integer getIndex1() {
+        return index1;
+    }
+
+    public Integer getIndex2() {
+        return index2;
     }
 
     public int getConstNumAt(int m) {

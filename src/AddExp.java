@@ -90,7 +90,7 @@ public class AddExp {
             part.remove(part.size() - 1);
             ans.addAll(part);
             String character = characters.get(i - 1);
-            String newTemp = Compiler.getNewTemp();
+            String newTemp = Compiler.getNewTempOrGlobal();
             if (character.equals("PLUS")) {
                 MidCode plusMidCode = new MidCode(OpType.ADD, newTemp, midCodeAns.getLeft(), midCodePart.getLeft());
                 ans.add(plusMidCode);

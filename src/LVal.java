@@ -83,12 +83,44 @@ public class LVal {
         if (exps.size() == 0) {
             // 这就是个0维变量调用
             assert item != null;
-            ans.add(new MidCode(item.getName()));
+            if (item.getIndex1() != null) {
+                ans.add(new MidCode(item.getName() + "_arr"));
+            } else {
+                ans.add(new MidCode(item.getName()));
+            }
             return ans;
         } else if (exps.size() == 1) {
             ans.addAll(exps.get(0).getMidCode(lastFunc));
+            MidCode midCode = ans.get(ans.size() - 1);
+            ans.remove(ans.size() - 1);
+            String indexTemp = Compiler.getNewTempOrGlobal();
+            ans.add(new MidCode(OpType.ASSIGN, indexTemp, midCode.getLeft()));
+            if (item.getIndex2() != null) {
+                String newTemp = Compiler.getNewTempOrGlobal();
+                ans.add(new MidCode(OpType.ASSIGN, newTemp, item.getIndex2()));
+                ans.add(new MidCode(OpType.MUL, indexTemp, indexTemp, newTemp));
+                ans.add(new MidCode(item.getName() + "_" + indexTemp + "_arr"));
+            } else {
+                ans.add(new MidCode(item.getName() + "_" + indexTemp)); //没乘4
+            }
+        } else if (exps.size() == 2) {
+            ans.addAll(exps.get(0).getMidCode(lastFunc));
+            MidCode midCode1 = ans.get(ans.size() - 1);
+            ans.remove(ans.size() - 1);
+            ans.addAll(exps.get(1).getMidCode(lastFunc));
+            MidCode midCode2 = ans.get(ans.size() - 1);
+            ans.remove(ans.size() - 1);
+
+            int index = item.getIndex2();
+            String newTemp = Compiler.getNewTempOrGlobal();
+            String temp = Compiler.getNewTempOrGlobal();
+            String indexTemp = Compiler.getNewTempOrGlobal();
+            ans.add(new MidCode(OpType.IMM, newTemp, "" + index));
+            ans.add(new MidCode(OpType.MUL, temp, newTemp, midCode1.getLeft()));
+            ans.add(new MidCode(OpType.ADD, indexTemp, temp, midCode2.getLeft()));
+            ans.add(new MidCode(item.getName() + "_" + indexTemp));
         }
-        
+
 
         return ans;
     }

@@ -444,9 +444,13 @@ public class LexAnalysis {
         ident.append(current);
         getNextChar();
         //下划线的下一个字符是数字，不符合ident
+        //todo
+        /*
         if (isNumber(current)) {
             return 0;
         }
+
+         */
         while (isIdentifier(current)) {
             ident.append(current);
             getNextChar();

@@ -1,11 +1,30 @@
-
-const int e[2][2] = {{1,2},{3,4}};
-
-int func1(){
-    return 1;
+// #include "test.h"
+int next[4][2]={{1,0},{0,-1},{-1,0},{0,1}};
+void printArr(int a[]){
+    int i=0;
+    while(i<2){
+        printf("%d",a[i]);
+        i=i+1;
+    }
+    printf("\n");
+}
+void printArr2(int a[][2]){
+    /*
+    int i=0;
+    while(i<4){
+        printArr(a[i]);
+        i=i+1;
+    }
+    */
+    printArr(a[0]);
+    printArr(a[1]);
+    printArr(a[2]);
+    printArr(a[3]);
+    return;
 }
 int main(){
-    int t = 5;
-    int arr1[e[0][1]] = {func1(),t};
+
+    printArr2(next);
+
     return 0;
 }

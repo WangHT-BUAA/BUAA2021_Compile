@@ -91,7 +91,7 @@ public class MulExp {
             part.remove(part.size() - 1);
             ans.addAll(part);
             String character = characters.get(i - 1);
-            String newTemp = Compiler.getNewTemp();
+            String newTemp = Compiler.getNewTempOrGlobal();
             if (character.equals("MULT")) {
                 MidCode mulMidCode = new MidCode(OpType.MUL, newTemp, midCodeAns.getLeft(), midCodePart.getLeft());
                 ans.add(mulMidCode);

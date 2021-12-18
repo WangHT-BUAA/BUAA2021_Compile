@@ -19,7 +19,7 @@ public class Compiler {
 
     public static int tempNumber = 0;
     public static int globalNumber = 0;
-    public static int arrNumber = 0;
+    public static int ptrNumber = 0;
     public static int funcNumber = 0;
     public static int strNumber = 0;
     public static int ifNumber = 0;
@@ -139,12 +139,29 @@ public class Compiler {
 
     public static void clearTempNum() {
         tempNumber = 0;
+        ptrNumber = 0;
     }
 
     public static String getNewTemp() {
         String ans = "temp" + tempNumber;
         tempNumber++;
+        ptrNumber++;
         return ans;
+    }
+
+    public static String getNewPtr() {
+        String ans = "ptr" + ptrNumber;
+        ptrNumber++;
+        tempNumber++;
+        return ans;
+    }
+
+    public static String getNewTempOrGlobal() {
+        if (Decl.isGlobal) {
+            return getNewGlobal();
+        } else {
+            return getNewTemp();
+        }
     }
 
 
@@ -210,6 +227,22 @@ public class Compiler {
         for (int i = globalSymbolTable.size() - 1; i >= 0; i--) {
             SymbolItem part = globalSymbolTable.get(i);
             if (part.getInitName().equals(initName)) {
+                return part;
+            }
+        }
+        return null;
+    }
+
+    public static SymbolItem getItemByName(String name) {
+        for (int i = symbolTable.size() - 1; i >= 0; i--) {
+            SymbolItem part = symbolTable.get(i);
+            if (part.getName().equals(name)) {
+                return part;
+            }
+        }
+        for (int i = globalSymbolTable.size() - 1; i >= 0; i--) {
+            SymbolItem part = globalSymbolTable.get(i);
+            if (part.getName().equals(name)) {
                 return part;
             }
         }
