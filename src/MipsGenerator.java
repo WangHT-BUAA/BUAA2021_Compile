@@ -4,10 +4,14 @@ import java.util.regex.Pattern;
 
 public class MipsGenerator {
     private ArrayList<MipsCode> mipsCodes = new ArrayList<>();
+    private boolean openOptimize = true;
 
     public void genMips(ArrayList<MidCode> midCodes) {
         addDataSection();
         addTextSection(midCodes);
+        if (openOptimize) {
+            optimizeMipsCodes();
+        }
     }
 
     public ArrayList<MipsCode> getMipsCodes() {
@@ -21,6 +25,27 @@ public class MipsGenerator {
         for (String key : Compiler.printStr.keySet()) {
             String asciiz = Compiler.printStr.get(key) + ": .asciiz \"" + key + "\"";
             mipsCodes.add(new MipsCode(asciiz));
+        }
+    }
+
+    private void optimizeMipsCodes() {
+        deleteRepeat();
+    }
+
+    private void deleteRepeat() {
+        for (int i = mipsCodes.size() - 1; i >= 1; i--) {
+            //sw
+            //lw
+            MipsCode code1 = mipsCodes.get(i);
+            MipsCode code2 = mipsCodes.get(i - 1);
+            if (code1.getMipsOp() == MipsOp.lw && code2.getMipsOp() == MipsOp.sw) {
+                if (code1.getLeft().equals(code2.getLeft()) && code1.getRight1().equals(code2.getRight1())) {
+                    //System.out.println("here!!!!!");
+                    mipsCodes.remove(i);
+                    mipsCodes.remove(i - 1);
+
+                }
+            }
         }
     }
 
@@ -651,6 +676,22 @@ class MipsCode {
 
     public MipsCode(String information) {
         this.information = information;
+    }
+
+    public MipsOp getMipsOp() {
+        return mipsOp;
+    }
+
+    public String getLeft() {
+        return left;
+    }
+
+    public String getRight1() {
+        return right1;
+    }
+
+    public String getRight2() {
+        return right2;
     }
 
     public String toString() {

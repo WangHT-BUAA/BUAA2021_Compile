@@ -5,42 +5,26 @@ str1: .asciiz "\n"
 .text
 add $gp , $gp , 0x38000
 li $s0 , 1
-sw $s0 , -0($gp)
-lw $s0 , -0($gp)
 sw $s0 , -40($gp)
 li $s0 , 0
-sw $s0 , -4($gp)
-lw $s0 , -4($gp)
 sw $s0 , -44($gp)
 li $s0 , 0
-sw $s0 , -8($gp)
-lw $s0 , -8($gp)
 sw $s0 , -48($gp)
 li $s0 , 1
 sw $s0 , -12($gp)
 lw $t1 , -12($gp)
 sub $s0 , $0 , $t1
-sw $s0 , -16($gp)
-lw $s0 , -16($gp)
 sw $s0 , -52($gp)
 li $s0 , 1
 sw $s0 , -20($gp)
 lw $t1 , -20($gp)
 sub $s0 , $0 , $t1
-sw $s0 , -24($gp)
-lw $s0 , -24($gp)
 sw $s0 , -56($gp)
 li $s0 , 0
-sw $s0 , -28($gp)
-lw $s0 , -28($gp)
 sw $s0 , -60($gp)
 li $s0 , 0
-sw $s0 , -32($gp)
-lw $s0 , -32($gp)
 sw $s0 , -64($gp)
 li $s0 , 1
-sw $s0 , -36($gp)
-lw $s0 , -36($gp)
 sw $s0 , -68($gp)
 Main:
 sw $ra , -8($sp)
@@ -59,8 +43,6 @@ lw $v0 , -4($sp)
 jr $ra
 func0:
 li $s0 , 0
-sw $s0 , -4($sp)
-lw $s0 , -4($sp)
 sw $s0 , -8($sp)
 while0:
 li $s0 , 2
@@ -92,8 +74,6 @@ sw $s0 , -24($sp)
 lw $t1 , -8($sp)
 lw $t2 , -24($sp)
 add $s0 , $t1 , $t2
-sw $s0 , -28($sp)
-lw $s0 , -28($sp)
 sw $s0 , -8($sp)
 j while0
 while0_end:
@@ -104,8 +84,6 @@ jr $ra
 func1:
 sw $ra , -68($sp)
 li $s0 , 0
-sw $s0 , -4($sp)
-lw $s0 , -4($sp)
 sw $s0 , -8($sp)
 li $s0 , 2
 sw $s0 , -12($sp)
@@ -125,8 +103,6 @@ lw $ra , -68($sp)
 sw $v0 , -16($sp)
 sw $ra , -68($sp)
 li $s0 , 1
-sw $s0 , -20($sp)
-lw $s0 , -20($sp)
 sw $s0 , -24($sp)
 li $s0 , 2
 sw $s0 , -28($sp)
@@ -146,8 +122,6 @@ lw $ra , -68($sp)
 sw $v0 , -32($sp)
 sw $ra , -68($sp)
 li $s0 , 2
-sw $s0 , -36($sp)
-lw $s0 , -36($sp)
 sw $s0 , -40($sp)
 li $s0 , 2
 sw $s0 , -44($sp)
@@ -167,8 +141,6 @@ lw $ra , -68($sp)
 sw $v0 , -48($sp)
 sw $ra , -68($sp)
 li $s0 , 3
-sw $s0 , -52($sp)
-lw $s0 , -52($sp)
 sw $s0 , -56($sp)
 li $s0 , 2
 sw $s0 , -60($sp)
